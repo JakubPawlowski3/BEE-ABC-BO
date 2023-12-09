@@ -33,17 +33,19 @@ class Bee():
     def generate_solution(self, producents, customers, distance, price):
         number_producents = len(producents[0])
         number_customers = len(customers[0])
-        product = [[0] * number_customers for _ in range(number_producents)]
+        cost = [[0] * number_customers for _ in range(number_producents)]
+        product = [[0] * number_customers for _ in range(number_producents)]        
 
         for i in range(number_producents):
             for j in range(number_customers):
                 if (customers[i][j] > 0):
-                    product[i][j] = round(price[i][j] * customers[i][j] + distance[i][j] * 0.45, 2)
+                    cost[i][j] = round(price[i][j] * customers[i][j] + distance[i][j] * 0.45, 2)
+                    product[i][j] = customers[i][j]
                     
                 else:
-                    product[i][j] = 0
+                    cost[i][j] = 0
               
-        return product
+        return cost, product
 
 
         
@@ -64,8 +66,11 @@ matrix_price = [producentA.price, producentB.price, producentC.price, producentD
 distance = [[round(random.uniform(0.0, 10.0), 2) for i in range(4)] for j in range(4)]
 
 bee1 = Bee(matrix_producent, matrix_customer, distance, matrix_price)
-product = bee1.generate_solution(bee1.producents, bee1.customers, bee1.distance, bee1.price)
+cost, product = bee1.generate_solution(bee1.producents, bee1.customers, bee1.distance, bee1.price)
 for row in product:
+    print(row)
+print("\n")
+for row in cost:
     print(row)
     
 
