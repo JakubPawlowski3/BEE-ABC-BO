@@ -9,6 +9,9 @@ cost, product = bee1.generate_solution(bee1.producents, bee1.customers, bee1.dis
 for row in matrix_producent:
     print(row)
 print("\n")
+for row in matrix_customer:
+    print(row)
+print("\n")
 for i in range(len(product)):
     for j in range(len(product[i])):
 

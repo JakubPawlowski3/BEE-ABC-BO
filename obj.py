@@ -49,7 +49,7 @@ class Bee():
             for i in range(number_producents):
                 for j in range(number_customers):
                     if (customers[i][j] > 0):
-                        product[i][j] = customers[i][j]
+                        product[j][j] = customers[j][j]
 
 
                     else:
