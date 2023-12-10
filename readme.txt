@@ -10,3 +10,5 @@ Koszt transportu rozpatrywany jest osobno dla każdego produktu.} ///* ZROBIONE 
 {Zaopatrzenie w postaci macierzy, ilość takich macierzy wynosi k, ponieważ mamy k produktów, w pierwszej iteracji rozwiązanie nie ma na celu 
 funkcji celu, klient a bierze produkty od producenta a nie patrząc na cene, jest to nasza baza wyjścia która w kolejnych
 iteracjach polepszamy} ///* ZROBIONE *///
+
+{Polepszenie naszej bazy z uwzglednieniem macierzy kosztu, w każdej kolejnej iteracji polepszenie ma być coraz lepsze} ///* TODO *///
