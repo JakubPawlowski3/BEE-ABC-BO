@@ -12,7 +12,6 @@ for i in range(len(matrix_producent[0])):
     max_demand += matrix_producent[i][0]
 max_demand = max_demand // 4
 
-
 customerA = Customers(1, [random.randint(0, max_demand) for i in range(4)])
 customerB = Customers(2, [random.randint(0, max_demand) for i in range(4)])
 customerC = Customers(3, [random.randint(0, max_demand) for i in range(4)])
