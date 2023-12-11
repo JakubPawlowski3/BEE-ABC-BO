@@ -12,4 +12,4 @@ Zadanie na 11.12.2023:
 - Zastanowić się w jaki sposób uzupełniać kolejne możliwości doboru zapotrzebowania od producentów.
 - Zaimplementowac funkcję łącznego kosztu, która stanowi ocenę jakości danego rozwiazania.
 - Przemyśleć w jaki sposób dopasować to przeszukiwanie macierzy pod kątem algorytmu pszczelego ABC
-- Zastanowić się czy robienie tego dzisiaj ma sens. JEBAĆ BO lepsze TS.
+- Zastanowić się czy robienie tego dzisiaj ma sens
