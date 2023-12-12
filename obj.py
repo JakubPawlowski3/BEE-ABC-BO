@@ -1,5 +1,5 @@
 import random
-
+import numpy as np
 # do wytworzenia macierzy kosztu transportu macierz = [[random.uniform(0.0, 10.0) for i in range(producents)] for i in range(customers)]
 # do wytworzenia ilosci produktow lista_produktow = [random.randint(max_demand, 100) for i in range(n)]
 # do wytworzenia cen produktow cena_produktow = [round(random.uniform(0.0, 100.0), 2) for i in range(n)]
@@ -41,22 +41,31 @@ class Bee():
     def generate_solution(self, producents, customers, distance, price, number_products):
         number_producents = len(producents[0])
         number_customers = len(customers[0])
-        cost = [[0] * number_customers for _ in range(number_producents)]
-        product = [[0] * number_customers for _ in range(number_producents)]
+        u = 0
 
-        list_product_matrix = [] 
+        list_product_matrix = [0 for i in range(number_products)] 
         for k in range(number_products):
+            product = [[0] * number_customers for _ in range(number_producents)]
+            sum0 = 0
+            sum1 = 0
             for i in range(number_producents):
                 for j in range(number_customers):
                     if (customers[i][j] > 0):
-                        product[j][j] = customers[j][j]
+                        n = customers[j][k] // 4
+                        product[i][j] = n
+                else:
+                    product[i][j] = 0
+            sum0 = np.sum(product, axis=0)
+            for l in range(number_products):
+                m = customers[l][u] - sum0[l]
+                if (m != 0):
+                    product[0][l] += np.abs(m)
+            u += 1
+                
 
-
-                    else:
-                        cost[i][j] = 0
-            list_product_matrix.append(product)
+            list_product_matrix[k] = product
         
 
-        return cost, list_product_matrix
+        return list_product_matrix
 
 
