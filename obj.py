@@ -53,22 +53,20 @@ class Bee():
                     if (customers[i][j] > 0):
                         n = customers[j][k] // 4
                         product[i][j] = n
-                else:
-                    product[i][j] = 0
+
+
+                    else:
+                        cost[i][j] = 0
             sum0 = np.sum(product, axis=0)
             for l in range(number_products):
-                q = 1
                 m = customers[l][u] - sum0[l]
-                if (m != 0):
-                    
+                o = producents[l][u] - m
+                q = [0, 1, 2, 3]
+                if (m != 0 and o > 0):
+
                     product[0][l] += np.abs(m)
-                    o = producents[0][l] - product[0][l]
-                    if (o < 0):
-                        q += l
-                        if (q > 3):
-                            q = 1
-                        product[0][l] -= np.abs(m)
-                        product[0][q] += np.abs(m)
+                if (m != 0 and o < 0):
+                    product[0][q[l]] += np.abs(m) 
             u += 1
                 
 
