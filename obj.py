@@ -34,11 +34,11 @@ class Bee():
         self.number_products = number_products
         
 
-        self.generate_solution(producents, customers, distance, price, number_products)
+        
     
 
         
-    def generate_solution(self, producents, customers, distance, price, number_products):
+    def generate_solution_equal(self, producents, customers, distance, price, number_products):
         number_producents = len(producents[0])
         number_customers = len(customers[0])
         u = 0
@@ -75,4 +75,31 @@ class Bee():
 
         return list_product_matrix
 
+    def generate_matrix_production(self, customers, producents, n, number_producents, number_customers):
+        matrixes = []
 
+        while len(matrixes) < n:
+            matrix = np.zeros((number_producents, number_customers), dtype=int)
+
+            for j in range(number_producents):
+                value = customers[j]
+                for i in range(number_customers):
+                    if i == number_customers - 1:
+                        a = producents[i] - np.sum(matrix[:j, i])
+                        if value <= a:
+                            matrix[j, i] = value
+                        else:
+                            break  # Przerwanie pętli w przypadku braku dopuszczalnej macierzy
+                    else:
+                        x = random.randint(0, min(value, producents[i] - np.sum(matrix[:j, i])))
+                        matrix[j, i] = x
+                        value -= x
+                else:
+                    continue
+                break
+
+            else:
+                # Ta część kodu zostanie wykonana, jeśli pętla zakończy się naturalnie (bez przerwania)
+                matrixes.append(matrix)
+
+        return matrixes
