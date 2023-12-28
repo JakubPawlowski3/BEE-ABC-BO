@@ -33,7 +33,19 @@ class Bee():
         self.price = price
         self.number_products = number_products
         
-
+    def function(self, producents, customers, price, distance):
+        n = len(producents)
+        m = len(customers)
+        matrix = [[0] for i in range(n)]
+        for i in range(n):
+            for j in range(m):
+                if customers[i][j] >= 0.1 * producents[i][j]:
+                    matrix[i][j] = customers[i][j] * price[i][j]
+                else:
+                    matrix[i][j] = customers[i][j] * price[i][j] + 0.45 * distance[i][j]
+        return matrix
+                    
+        
         
     
 
