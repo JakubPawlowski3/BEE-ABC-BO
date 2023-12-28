@@ -1,4 +1,5 @@
 import random
+import copy
 import numpy as np
 # do wytworzenia macierzy kosztu transportu macierz = [[random.uniform(0.0, 10.0) for i in range(producents)] for i in range(customers)]
 # do wytworzenia ilosci produktow lista_produktow = [random.randint(max_demand, 100) for i in range(n)]
@@ -57,7 +58,33 @@ class Bee():
                     
         
         
-    
+    def correct_position(self, new_bee, restriction, production):
+        counter=0
+        rows=np.sum(new_bee,axis=1)
+        while not np.all(restriction == rows):
+            a=np.shape(new_bee)[0]
+            b=np.shape(new_bee)[1]
+            for i in range(a):
+                for j in range(b):
+                    k=random.randint(0,b-1)
+                    roz=np.abs(restriction[i]-rows[i])
+                    value=random.randint(0,roz)
+                    if restriction[i] >= rows[i]:
+                        if np.sum(new_bee,axis=0)[k]+value <= production[k]:
+                            new_bee[i,k]=new_bee[i,k]+value
+                            rows=np.sum(new_bee,axis=1)
+                            break
+                    if restriction[i]< rows[i]:
+                        if new_bee[i,k]-value > 0:
+                            new_bee[i,k]=new_bee[i,k]-value
+                            rows=np.sum(new_bee,axis=1)
+                            break
+            counter+=1
+            rows=np.sum(new_bee,axis=1)
+            if counter >= 1000:
+                print("Przekroczono maksymalną liczbę iteracji. Zwracanie macierzy zer.")
+                return np.zeros((a, b), dtype=int)
+        return new_bee 
 
         
     def generate_solution_equal(self, producents, customers, distance, price, number_products):
@@ -133,12 +160,25 @@ class Bee():
 
         return matrixes, vector, vector_eff
 
-    def generate_neigbours(self, matrix):
-        n = len(mmatrix[0])
+    def generate_neighbours(self, matrix, production, customers):
+        n = len(matrix)
         neighbours_matrix = [[0]*n for i in range(n)]
         fi = np.random.randint(0, 2, size=(n,n))
-        for i in range(len(n)):
-            neighbours_matrix = matrix[i] + fi
-        return neigbours_matrix
-    def employee_bees(self, matrixes, vector, eff):
+        neighbours_matrix = matrix + fi
+        corrected_neighbour = self.correct_position(neighbours_matrix, customers, production)
+        return corrected_neighbour
+
+    def employee_bees(self, matrixes, vector, eff, production, restriction, producents, distribuation, price, distance):
+        list_neighbours = [0 for i in range(len(matrixes))]
         for i in range(len(matrixes)):
+            neighbour_matrix = self.generate_neighbours(matrixes[i], production, restriction)
+            new_value = self.function(producents, neighbour_matrix, price, distance)
+            if new_value < vector[i]:
+                list_neighbours[i] = neighbour_matrix
+                print(new_value)
+                vector[i] = new_value
+                eff[i] = self.function_efficency(new_value)
+            else:
+                list_neighbours[i] = matrixes[i]
+        matrixes = list_neighbours
+        return matrixes, vector, eff
