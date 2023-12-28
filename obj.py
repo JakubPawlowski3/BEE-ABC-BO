@@ -96,9 +96,10 @@ class Bee():
         return list_product_matrix
 
     def generate_matrix_production(self, customers, producents, n, number_producents, number_customers):
-        matrixes = []
         matrix_fun, value_fun = function(self, customers, producents, price, distance)
         value_fun_eff = function_efficency(self, value_fun)
+
+        matrixes = []
         vector = []
         vector_eff = []
 
