@@ -33,22 +33,24 @@ class Bee():
         self.price = price
         self.number_products = number_products
         
-    def function(self, producents, customers, price, distance):
-        n = len(producents)
-        m = len(customers)
+    def function(self, producents, distribuation, price, distance):
+        m = len(producents[0])
+        n = len(distribuation[0])
         value = 0
-        matrix = [[0] for i in range(n)]
+        matrix = [[0] * m for i in range(n)]
         for i in range(n):
             for j in range(m):
-                if customers[i][j] >= 0.1 * producents[i][j]:
-                    matrix[i][j] = customers[i][j] * price[i][j]
+                if distribuation[i][j] >= 0.1 * producents[j][0]:
+                    matrix[i][j] = distribuation[i][j] * price[j][0]
                 else:
-                    matrix[i][j] = customers[i][j] * price[i][j] + 0.45 * distance[i][j]
+                    matrix[i][j] = distribuation[i][j] * price[j][0] + 0.45 * distance[i][j]
                 value += matrix[i][j]
+                value = round(value, 5)
         return value
     
-    def function_efficeny(self, value):
-        value_eff = 1/(1+value)
+    def function_efficency(self, value):
+        value_eff = 1 / (1 + value)
+        value_eff = round(value_eff, 5)
                 
         return value_eff
 
@@ -95,7 +97,7 @@ class Bee():
 
         return list_product_matrix
 
-    def generate_matrix_production(self, customers, producents, n, number_producents, number_customers, price, distance):
+    def generate_matrix_production(self, producents, customers, vector_producents, n, number_producents, number_customers, price, distance):
 
 
         matrixes = []
@@ -109,13 +111,13 @@ class Bee():
                 value = customers[j]
                 for i in range(number_customers):
                     if i == number_customers - 1:
-                        a = producents[i] - np.sum(matrix[:j, i])
+                        a = vector_producents[i] - np.sum(matrix[:j, i])
                         if value <= a:
                             matrix[j, i] = value
                         else:
                             break  # Przerwanie pętli w przypadku braku dopuszczalnej macierzy
                     else:
-                        x = random.randint(0, min(value, producents[i] - np.sum(matrix[:j, i])))
+                        x = random.randint(0, min(value, vector_producents[i] - np.sum(matrix[:j, i])))
                         matrix[j, i] = x
                         value -= x
                 else:
@@ -126,7 +128,17 @@ class Bee():
                 # Ta część kodu zostanie wykonana, jeśli pętla zakończy się naturalnie (bez przerwania)
                 matrixes.append(matrix)
         for i in range(len(matrixes)):
-            vector.append(function(matrixes[i], producents, price, distance))
-            vector_eff.append(function_efficency(vector[i]))
+            vector.append(self.function(producents, matrixes[i], price, distance))
+            vector_eff.append(self.function_efficency(vector[i]))
 
-        return matrixes
+        return matrixes, vector, vector_eff
+
+    def generate_neigbours(self, matrix):
+        n = len(mmatrix[0])
+        neighbours_matrix = [[0]*n for i in range(n)]
+        fi = np.random.randint(0, 2, size=(n,n))
+        for i in range(len(n)):
+            neighbours_matrix = matrix[i] + fi
+        return neigbours_matrix
+    def employee_bees(self, matrixes, vector, eff):
+        for i in range(len(matrixes)):
