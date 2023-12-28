@@ -36,6 +36,7 @@ class Bee():
     def function(self, producents, customers, price, distance):
         n = len(producents)
         m = len(customers)
+        value = 0
         matrix = [[0] for i in range(n)]
         for i in range(n):
             for j in range(m):
@@ -43,7 +44,8 @@ class Bee():
                     matrix[i][j] = customers[i][j] * price[i][j]
                 else:
                     matrix[i][j] = customers[i][j] * price[i][j] + 0.45 * distance[i][j]
-        return matrix
+                value += matrix[i][j]
+        return matrix, value
     
     def function_efficenty(self, matrix):
         n = len(matrix)
