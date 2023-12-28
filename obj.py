@@ -47,12 +47,9 @@ class Bee():
                 value += matrix[i][j]
         return matrix, value
     
-    def function_efficenty(self, matrix):
-        n = len(matrix)
-        matrix_eff = [[0] for i in range(n)]
-        for i in range(n):
-            for j in range(n):
-                matrix_eff[i][j] = 1 / (1 + matrix[i][j])
+    def function_efficenty(self, value):
+        value_eff = 1/(1+value)
+                
         return matrix_eff
 
                     
