@@ -45,12 +45,12 @@ class Bee():
                 else:
                     matrix[i][j] = customers[i][j] * price[i][j] + 0.45 * distance[i][j]
                 value += matrix[i][j]
-        return matrix, value
+        return value
     
     def function_efficeny(self, value):
         value_eff = 1/(1+value)
                 
-        return matrix_eff
+        return value_eff
 
                     
         
@@ -95,9 +95,8 @@ class Bee():
 
         return list_product_matrix
 
-    def generate_matrix_production(self, customers, producents, n, number_producents, number_customers):
-        matrix_fun, value_fun = function(self, customers, producents, price, distance)
-        value_fun_eff = function_efficency(self, value_fun)
+    def generate_matrix_production(self, customers, producents, n, number_producents, number_customers, price, distance):
+
 
         matrixes = []
         vector = []
@@ -127,9 +126,7 @@ class Bee():
                 # Ta część kodu zostanie wykonana, jeśli pętla zakończy się naturalnie (bez przerwania)
                 matrixes.append(matrix)
         for i in range(len(matrixes)):
-            for j in range(len(number_producents)):
-                for k in range(len(number_customers)):
-                    vector.append(matrixes[i][j][k] * value_fun)
-                    vector_eff.append(matrixes[i][j][k]* value_fun_eff)
+            vector.append(function(matrixes[i], producents, price, distance))
+            vector_eff.append(function_efficency(vector[i]))
 
         return matrixes
