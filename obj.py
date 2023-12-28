@@ -44,6 +44,15 @@ class Bee():
                 else:
                     matrix[i][j] = customers[i][j] * price[i][j] + 0.45 * distance[i][j]
         return matrix
+    
+    def function_efficenty(self, matrix):
+        n = len(matrix)
+        matrix_eff = [[0] for i in range(n)]
+        for i in range(n):
+            for j in range(n):
+                matrix_eff[i][j] = 1 / (1 + matrix[i][j])
+        return matrix_eff
+
                     
         
         
