@@ -58,33 +58,40 @@ class Bee():
                     
         
         
-    def correct_position(self, new_bee, restriction, production):
+    def correct_position(self, new_bee,ograniczenia,produkcja):
+        
         counter=0
-        rows=np.sum(new_bee,axis=1)
-        while not np.all(restriction == rows):
+        kolumny = np.sum(new_bee, axis=0)
+        wiersze = np.sum(new_bee, axis=1)
+        
+        while not(np.all(ograniczenia == wiersze) and np.all(kolumny <= produkcja)):
             a=np.shape(new_bee)[0]
             b=np.shape(new_bee)[1]
             for i in range(a):
                 for j in range(b):
                     k=random.randint(0,b-1)
-                    roz=np.abs(restriction[i]-rows[i])
+                    roz=np.abs(ograniczenia[i]-wiersze[i])
                     value=random.randint(0,roz)
-                    if restriction[i] >= rows[i]:
-                        if np.sum(new_bee,axis=0)[k]+value <= production[k]:
-                            new_bee[i,k]=new_bee[i,k]+value
-                            rows=np.sum(new_bee,axis=1)
+                    if ograniczenia[i] >= wiersze[i]:
+                        if np.sum(new_bee,axis=0)[k]+value <= produkcja[k]:
+                            new_bee[i, k] = new_bee[i, k] + value
+                            kolumny = np.sum(new_bee, axis=0)
+                            wiersze=np.sum(new_bee,axis=1)
                             break
-                    if restriction[i]< rows[i]:
+                    if ograniczenia[i]< wiersze[i]:
                         if new_bee[i,k]-value > 0:
-                            new_bee[i,k]=new_bee[i,k]-value
-                            rows=np.sum(new_bee,axis=1)
+                            new_bee[i, k] = new_bee[i, k] - value
+                            kolumny = np.sum(new_bee, axis=0)
+                            wiersze=np.sum(new_bee,axis=1)
                             break
-            counter+=1
-            rows=np.sum(new_bee,axis=1)
-            if counter >= 1000:
+            counter += 1
+            kolumny = np.sum(new_bee, axis=0)
+            wiersze=np.sum(new_bee,axis=1)
+            if counter >= 10000:
+                
                 print("Przekroczono maksymalną liczbę iteracji. Zwracanie macierzy zer.")
                 return np.zeros((a, b), dtype=int)
-        return new_bee 
+        return new_bee
 
         
     def generate_solution_equal(self, producents, customers, distance, price, number_products):
@@ -168,17 +175,80 @@ class Bee():
         corrected_neighbour = self.correct_position(neighbours_matrix, customers, production)
         return corrected_neighbour
 
-    def employee_bees(self, matrixes, vector, eff, production, restriction, producents, distribuation, price, distance):
+    def employee_bees(self, matrixes, vector, eff, production, restriction, producents, price, distance):
+        counter_list = [0 for i in range(len(matrixes))]
         list_neighbours = [0 for i in range(len(matrixes))]
         for i in range(len(matrixes)):
             neighbour_matrix = self.generate_neighbours(matrixes[i], production, restriction)
             new_value = self.function(producents, neighbour_matrix, price, distance)
             if new_value < vector[i]:
                 list_neighbours[i] = neighbour_matrix
-                print(new_value)
                 vector[i] = new_value
                 eff[i] = self.function_efficency(new_value)
             else:
                 list_neighbours[i] = matrixes[i]
+                counter_list[i] += 1
         matrixes = list_neighbours
-        return matrixes, vector, eff
+        return matrixes, vector, eff, counter_list
+    
+    def onlooker_bees(self, matrixes, vector, eff, counter_list, ob, production, customers, producents, price, distance):
+        counter = 0
+        counter_help = 0
+        matrixes1 = np.array(matrixes[0])
+        list_position = [np.zeros(np.shape(matrixes1)) for i in range(ob)]
+        list_value = [0 for i in range(ob)]
+        list_efficency = [0 for i in range(ob)]
+        list_probability = [0 for i in range(ob)]
+        for i in range(len(eff)):
+            list_probability[i] = eff[i] / np.sum(eff)
+        while counter < ob:
+            for i in range(ob):
+                for j in range(len(matrixes)):
+                    r = random.uniform(0, 1)
+                    if r < list_probability[j]:
+                        if np.array_equal(list_position[i], np.zeros(np.shape(matrixes1))):
+                            list_position[i] = self.generate_neighbours(matrixes[j], production, customers)
+                            list_value[i] = self.function(producents, list_position[i], price, distance)
+                            list_efficency[i] = self.function_efficency(list_value[i])
+                            if vector[j] > list_value[i]:
+                                matrixes[j] = list_position[i]
+                                vector[j] = list_value[i]
+                                eff[j] = list_efficency[i]
+                                counter_list[j] = 0
+                            counter += 1
+                            break
+        return matrixes, vector, eff, counter_list
+
+    def scout_bees(self, matrixes, counter_list, vector, eff, limit, producents, customers, vector_producents, number_products, number_customers, price, distance):
+        matrixes1 = np.array(matrixes[0])
+        list_position = [np.zeros(np.shape(matrixes1)) for i in range(len(matrixes))]
+        for i in range(len(matrixes)):
+            if counter_list[i] > limit:
+                matrix, vec, eff1 = self.generate_matrix_production(producents, customers, vector_producents, 1, number_products, number_customers, price, distance)
+                matrix = np.squeeze(np.array(matrix))
+                matrixes[i] = matrix
+                vector[i] = vec
+                eff[i] = eff1
+                counter_list[i] = 0
+            
+        return matrixes, np.squeeze(vector), np.squeeze(eff), counter_list
+
+
+    def ABC(self, restriction, producents, customers, vector_producents, n, ob, number_producents, number_customers, price, distance, limit, limit_iter):
+        population, vec, vec_eff = self.generate_matrix_production(producents, customers, vector_producents, n, number_producents, number_customers, price, distance)
+        vector_best = []
+        counter = 0
+        while counter < limit_iter:
+            population, vec, vec_eff, counter_list= self.employee_bees(population, vec, vec_eff, vector_producents, restriction, producents, price, distance)
+            
+            population, vec, vec_eff, counter_list = self.onlooker_bees(population, vec, vec_eff, counter_list, ob, vector_producents, customers, producents, price, distance)
+            population, vec, vec_eff, counter_list = self.scout_bees(population, counter_list, vec, vec_eff, limit, producents, customers, vector_producents, number_producents, number_customers, price, distance)
+            vector_best.append(min(vec))
+            counter += 1
+
+        fitness_index = np.argmin(vec)
+        fitness_value = vec[fitness_index]
+        population_best = population[fitness_index]
+
+        return population_best, vector_best, fitness_value
+
