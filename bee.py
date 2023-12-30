@@ -93,3 +93,4 @@ print("\n")
 
 print("\n")
 print(f"Wartosc dopasowania: {fitness_value}\n")
+print("\n")
