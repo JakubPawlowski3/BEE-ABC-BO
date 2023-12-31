@@ -1,0 +1,43 @@
+
+1. Została zmieniona funkcja correct_position . Dodałem funkcjonalność jeśli po określonej liczbie iteracji nie zwróci dopuszczalnej pozycji.
+
+2. Zmodyfikowałem funkcję overlooker_bees. Zmiana polegała tylko na zmianie długości list, ponieważ w głównym pliku masz długość listy "len(ob)" więc dla większej ilości pszczół pracująych niż obserwatorów się sypało, stąd zmieniłem długość tych list na "len(eff)". Dla większej liczby obserwatorów niż pszczół pracujących trzeba by jeszcze dodać ifa, aby inicjalizować to odwrotnie, ale raczej nie rozważamy sytuacji żeby nieróbów było więcej niż pracowników, ale może się wypierdolić i zrobic fikołka.
+
+3. Jeśli podasz sprzeczne dane dla produkcji algorytm się nie wykona np Jeśli klienci potrzebują razem 40 a producenci łącznie produkują 20. W tej sytuacji trzeba będzie dodać do głównej pętli algorytmu ABC sparwdzanie czy juz na wejściu nie są spierdole dane.
+
+4. Generalnie całkiem poprawnie to działa, jeśli chcesz go przyspieszyć mozesz bawić się nierównośćią "counter>..." w funkcji correct position od niej zależy najwięcej tutaj.
+
+5 W funkcji generacji rozwiazań(generate_production) oraz generate_neighbours są lekkie korekty z wymiarami żeby działało dla prostokątnych. Dobrze sobie zobacz, bo sprawdzałem dla takich instancji to działało. Tylko wtedy pamietaj o zmianie wszystkich macierzy do zadanego wymiaru
+
+Wytłumaczenie kolejnych oznaczeń u mnie:
+producenci- macierz pruducentów i produktów( wiersze producenci kolumny produkty)
+klienci- macierz zapotrzebowań klientów( wiersze klienci kolumny produkty)
+cena- macierz cen poszczególnych produktów ( produkt w kolumnie)
+dystans- dystans między klientami a producentami( klienci wiersze producenci kolumny)
+ograniczenia- zapotrzebowanie kolejnych klientów na 1 produkt
+produkcja- produkcja 1 produktu przez kolejnych producentów 
+macierz_test- testowa macierz do funkcji generacji sąsiada oraz korekty pozycji
+
+Parametry głównej pętli algorytmu:
+producents- macierz producentów czyli u mnie producenci
+customers- zapotrzebowania klientów u mnie (ograniczenia)
+vector_producents- ograniczenia wynikające z produkcji( u mnie produkcja)
+n- liczba pszczółek pracujących
+ob- liczba nierobów
+Pamiętaj n>ob !!!!- za nim zmodyfikujemy 
+number_producents- 1 wymiar naszej macierzy dopasowania( czyli liczba producentów(wierszy))
+number_customers- 1 wymiar naszej macierzy dopasowania( czyli liczba klientów(wierszy))
+price- macierz cen( u mnie cena)
+distance- macierz dystansu( u mnie dystans)
+limit- kryterium porzucenia odnoszące się do counter_list
+limit_iteration- ilość iteracji pętli while
+
+zamieniona jest lekko kolejność względem funkcji na gicie więc uważaj, ale mnie strasznie to wkurwiało jak niepotrzbene rzeczy były przekazywane lub w złej kolejności
+
+
+
+KONIEC 
+MATI SZEF
+
+
+
