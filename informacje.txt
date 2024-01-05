@@ -1,0 +1,19 @@
+W parametrach:
+- który produkt 
+- liczba pszczół pracujących
+- liczba obserwatorów
+- kryterium porzucenia(limit)
+- liczba iteracji
+
+wykres funkcji celu:
+- wykres minimalnej wartości funkcji celu w każdej iteracji
+
+- wiersze producenci i produkty kolumny(macierz producentów)
+- wiersze klienci i produkty kolumny(macierz klientów)
+
+ceny:
+- wiersze producenci i produkty kolumny
+
+dystans
+wiersze- klienci
+kolumny- producenci
