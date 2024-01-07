@@ -160,12 +160,18 @@ class Application(QWidget):
         self.distance_label = QLabel(self)
         self.distance_label.setPixmap(QPixmap('icons8-distance-48.png'))
         self.distance.clicked.connect(self.distance_ui)
+
+        self.main_prev = QPushButton("Menu główne", self.menu_frame)
+        self.main_prev_label = QLabel(self)
+        self.main_prev_label.setPixmap(QPixmap('icons8-home-page-40.png'))
+        self.main_prev.clicked.connect(self.main_prev_ui)
     
         self.parameters.setStyleSheet('background-color:darkviolet; color: white')
         self.diagram.setStyleSheet('background-color:darkviolet; color: white')
         self.distance.setStyleSheet('background-color:darkviolet; color: white')
         self.demand.setStyleSheet('background-color:darkviolet; color: white')
         self.price.setStyleSheet('background-color:darkviolet; color: white')
+        self.main_prev.setStyleSheet('background-color:darkviolet; color: white')
         
         
         self.layout_menuH1 = QHBoxLayout()
@@ -173,6 +179,8 @@ class Application(QWidget):
         self.layout_menuH3 = QHBoxLayout()
         self.layout_menuH4 = QHBoxLayout()
         self.layout_menuH5 = QHBoxLayout()
+        self.layout_menuH6 = QHBoxLayout()
+
 
         self.layout_menuH1.addWidget(self.parameters_label)
         self.layout_menuH1.addWidget(self.parameters)
@@ -193,6 +201,10 @@ class Application(QWidget):
         self.layout_menuH5.addWidget(self.distance_label)
         self.layout_menuH5.addWidget(self.distance)
         self.layout_menuH5.addStretch(20)
+
+        self.layout_menuH6.addWidget(self.main_prev_label)
+        self.layout_menuH6.addWidget(self.main_prev)
+        self.layout_menuH6.addStretch(20)
         
 
         self.menu_layout.addLayout(self.layout_menuH1)
@@ -200,6 +212,7 @@ class Application(QWidget):
         self.menu_layout.addLayout(self.layout_menuH3)
         self.menu_layout.addLayout(self.layout_menuH4)
         self.menu_layout.addLayout(self.layout_menuH5)
+        self.menu_layout.addLayout(self.layout_menuH6)
         
 
 #Ustawienie stron###########################################################
@@ -499,38 +512,38 @@ class Application(QWidget):
         self.menu_animation.start()
 
     def parameters_ui(self):
-        if self.counter_parameters % 2 != 0:
+        if self.stack_main_widget.currentWidget != self.parameters_page:
             self.bee_label.hide()
             self.stack_main_widget.setCurrentWidget(self.parameters_page)
-        if self.counter_parameters % 2 == 0:
+        else:
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_parameters += 1
         self.number_products = self.set_employee_bee.text()
         print(self.number_products)
     def demand_ui(self):
-        if self.counter_demand % 2 != 0:
+        if self.stack_main_widget.currentWidget != self.demand_page:
             self.bee_label.hide()
             self.stack_main_widget.setCurrentWidget(self.demand_page)
-        if self.counter_demand % 2 == 0:
+        else:
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_demand += 1
         print("clicked!")
     def price_ui(self):
-        if self.counter_price % 2 != 0:
+        if self.stack_main_widget.currentWidget != self.price_page:
             self.bee_label.hide()
             self.stack_main_widget.setCurrentWidget(self.price_page)
-        if self.counter_price % 2 == 0:
+        else:
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_price += 1
         print("clicked!")
     def distance_ui(self):
-        if self.counter_distance % 2 != 0:
+        if self.stack_main_widget.currentWidget != self.distance_page:
             self.bee_label.hide()
             self.stack_main_widget.setCurrentWidget(self.distance_page)
-        if self.counter_distance % 2 == 0:
+        else:
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_distance += 1
@@ -538,13 +551,17 @@ class Application(QWidget):
     def diagram_ui(self):
         # self.diagram_class = Canvas()
         # self.diagram_class.show()
-        if self.counter_diagram % 2 != 0:
+        if self.stack_main_widget.currentWidget != self.diagram_page:
             self.bee_label.hide()
             self.stack_main_widget.setCurrentWidget(self.diagram_page)
-        if self.counter_diagram % 2 == 0:
+        else:
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_diagram += 1
+    def main_prev_ui(self):
+        if self.stack_main_widget.currentWidget != self.main_page:
+            self.bee_label.show()
+            self.stack_main_widget.setCurrentWidget(self.main_page)
         
         print("clicked!")
     def update_text_E(self, text):
