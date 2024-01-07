@@ -11,7 +11,7 @@ class Producent():
         self.quantity = quantity
 
 class Bee():
-    def __init__(self, matrix_producents, matrix_customers, number_products, number_customers, number_bees, number_observator, restricition, producents, price, distance):
+    def __init__(self, product, matrix_producents, matrix_customers, number_products, number_customers, number_bees, number_observator, restricition, producents, price, distance):
         self.matrix_producents = matrix_producents
         self.matrix_customers = matrix_customers
         self.number_products = number_products
@@ -22,10 +22,12 @@ class Bee():
         self.producents = producents  #Wektor producentow produkujacych produkt X
         self.price = price
         self.distance = distance
+        self.product = product
 
     def function(self, distribuation):
-            m = len(self.matrix_producents[0])
-            n = len(distribuation[0])
+            k = self.product - 1
+            m = len(np.transpose(self.matrix_producents)[0])
+            n = len(np.transpose(distribuation)[0])
             value = 0
             matrix = [[0] * m for i in range(n)]
             for i in range(n):
@@ -64,13 +66,11 @@ class Bee():
                                 new_bee[i, k] = new_bee[i, k] + value
                                 kolumny = np.sum(new_bee, axis=0)
                                 wiersze=np.sum(new_bee,axis=1)
-                                break
                         if self.restricition[i]< wiersze[i]:
                             if new_bee[i,k]-value > 0:
                                 new_bee[i, k] = new_bee[i, k] - value
                                 kolumny = np.sum(new_bee, axis=0)
                                 wiersze=np.sum(new_bee,axis=1)
-                                break
                 counter += 1
                 kolumny = np.sum(new_bee, axis=0)
                 wiersze=np.sum(new_bee,axis=1)
@@ -113,7 +113,6 @@ class Bee():
             for i in range(len(matrixes)):
                 vector.append(self.function(matrixes[i]))
                 vector_eff.append(self.function_efficency(vector[i]))
-
             return matrixes, vector, vector_eff    
 
 
@@ -185,11 +184,15 @@ class Bee():
 
 
     def ABC(self, limit, limit_iter):
+            sum_produkcja=np.sum(self.production)
+            sum_ograniczenia=np.sum(self.restricition)
+            if sum_ograniczenia > sum_produkcja:
+                print("Dane nie umożliwiają rozwiązania problemu")
+                return 
             population, vec, vec_eff = self.generate_matrix_production(self.matrix_producents, self.number_bees)
             vector_best = []
             counter = 0
             while counter < limit_iter:
-                print(f" Mati to szef zapamiętaj to po raz  {counter}")
                 population, vec, vec_eff, counter_list= self.employee_bees(population, vec, vec_eff)
                 population, vec, vec_eff, counter_list = self.onlooker_bees(population, vec, vec_eff, counter_list, self.number_observator)
                 population, vec, vec_eff, counter_list = self.scout_bees(population, vec, vec_eff, counter_list, limit)
@@ -203,25 +206,26 @@ class Bee():
             return population_best, vector_best, fitness_value
 
 
-producenci=np.array([[35,21,33],[29,44,26],[1000,22,23]])
-klienci=np.array([[21,33,32],[33,32,23],[25,22,22]])
-cena=np.array([[10,4,5],[1,7,4],[1000,2,5]])
+producenci=np.array([[45,21,33],[40,40,26],[45,22,23]])
+klienci=np.array([[30,33,32],[33,32,23],[31,22,22]])
+cena=np.array([[3,4,5],[1,7,4],[100,2,5]])
 dystans=[[5,22,11],[100,55,30],[22,10,15]]
-ograniczenia=[23,21,33]
-produkcja=[45,40,1000]
 macierz_test = np.array([[3, 5, 6], [17, 10, 2], [11, 17, 7]])
+product = 1
+def get_restriction(customers, producents, k):
+    help_customers = np.transpose(customers)
+    help_producents = np.transpose(producents)
+    producents = help_producents[k - 1]
+    restricition = help_customers[k - 1]
+    return producents, restricition
+produkcja, ograniczenia = get_restriction(klienci, producenci, product)
 number_bees = 100
-number_observator = 20
+number_observator = 5
 number_products = 3
 number_customers = 3
-bee = Bee(producenci, klienci, number_products, number_customers, number_bees, number_observator, ograniczenia, produkcja, cena, dystans)
-popultaion_best,vector_best,fitness_value=bee.ABC(10, 100)
+bee = Bee(product, producenci, klienci, number_products,number_customers, number_bees, number_observator, ograniczenia, produkcja, cena, dystans)
+popultaion_best,vector_best,fitness_value=bee.ABC(5, 200)
 
-print("Jakub Pawłowski obliczył, że najlepsze jest dopasowanie: ", "\n")
 print(popultaion_best, "\n")
-print("najlepsza wartość funkcji celu jest równa:  ", "\n")
-print(fitness_value)
-print("wektor\n")
+print(fitness_value, "\n")
 print(vector_best)
-
-y=bee.function(popultaion_best)
