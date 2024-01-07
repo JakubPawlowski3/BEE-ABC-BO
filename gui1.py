@@ -464,7 +464,6 @@ class Application(QWidget):
         self.distance_grid_layout = QGridLayout(self.distance_frame)
 
 
-
         self.distance_text = QLabel("Uzupełnij macierz dystansów", self.distance_frame)
         self.distance_text.setStyleSheet('color: white')
         self.distance_layoutH2.addWidget(self.distance_text)
@@ -629,15 +628,15 @@ class Application(QWidget):
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
                 self.demand_grid_layout2.addWidget(lineedit, i, j)
-        for i in range(y):
+        for i in range(x):
             for j in range(z):
                 lineedit = QLineEdit(self.price_frame)
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
                 self.price_grid_layout.addWidget(lineedit, i, j)
-        for i in range(x):
-            for j in range(y):
+        for i in range(y):
+            for j in range(x):
                 lineedit = QLineEdit(self.distance_frame)
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
@@ -645,7 +644,7 @@ class Application(QWidget):
                 self.distance_grid_layout.addWidget(lineedit, i, j)
 
     def Import(self):
-        self.response = QFileDialog.getOpenFileName(parent=self, caption='Wybierz plik')
+        response = QFileDialog.getOpenFileName(parent=self, caption='Wybierz plik')
 
 
         
