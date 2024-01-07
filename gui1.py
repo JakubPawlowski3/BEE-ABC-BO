@@ -625,7 +625,7 @@ class Application(QWidget):
         #     self.demandH[lineedit].addWidget(lineedit)
         #     self.demand_frame_layout.addLayout(self.demandH[lineedit])
 
-    def update_matrix(self):
+    def update_matrix(self, flag = 0, matrix_producents = 0, matrix_clients  = 0, matrix_price  = 0, matrix_distance  = 0):
         self.lineedit_demand_producents = []
         self.lineedit_demand_clients = []
         self.lineedit_price = []
@@ -669,6 +669,10 @@ class Application(QWidget):
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                if flag == 1:
+                    lineedit.setText(str(matrix_producents[i][j]))
+                else:
+                    lineedit.setText('0')
                 self.lineedit_demand_producents.append(lineedit)
                 self.demand_grid_layout.addWidget(lineedit, i, j)
         
@@ -678,6 +682,10 @@ class Application(QWidget):
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                if flag == 1:
+                    lineedit.setText(str(matrix_clients[i][j]))
+                else:
+                    lineedit.setText('0')
                 self.lineedit_demand_clients.append(lineedit)
                 self.demand_grid_layout2.addWidget(lineedit, i, j)
         for i in range(x):
@@ -686,6 +694,10 @@ class Application(QWidget):
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                if flag == 1:
+                    lineedit.setText(str(matrix_clients[i][j]))
+                else:
+                    lineedit.setText('0')
                 self.lineedit_price.append(lineedit)
                 self.price_grid_layout.addWidget(lineedit, i, j)
         for i in range(y):
@@ -694,6 +706,10 @@ class Application(QWidget):
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                if flag == 1:
+                    lineedit.setText(str(matrix_distance[i][j]))
+                else:
+                    lineedit.setText('0')
                 self.lineedit_distance.append(lineedit)
                 self.distance_grid_layout.addWidget(lineedit, i, j)
  
@@ -706,8 +722,60 @@ class Application(QWidget):
         for edit in self.lineedit_distance:
             edit.textChanged.connect(self.update_edit)
     def Import(self):
-        response = QFileDialog.getOpenFileName(parent=self, caption='Wybierz plik')
+        try:
+            self.response = QFileDialog.getOpenFileName(parent=self, caption='Wybierz plik')
+        except FileNotFoundError:
+            return
+        if (self.response):
+            self.flag = 1
+        self.object = pd.read_csv(self.response[0])
+        self.object_producents = self.object["producenci"]
+        self.object_producents = self.object["producenci"].to_numpy()
+        self.object_producents_size = len(self.object_producents)
+        self.len_producents = len(self.object_producents)
+        self.len_sqrt = int(np.sqrt(self.len_producents))
+        self.rows_producents = int(self.len_producents / self.len_sqrt)
+        self.cols_producents = int(self.len_sqrt)
+        self.matrix_producents = self.object_producents.reshape((self.rows_producents, self.cols_producents))
 
+        self.set_product.setText(str(len(self.matrix_producents[0])))
+        self.tr = np.transpose(self.matrix_producents)
+        self.demand_producents_edit.setText(str(len(self.tr[0])))
+
+        self.object_clients = self.object["klienci"]
+        self.object_clients = self.object["klienci"].to_numpy()
+        self.object_clients_size = len(self.object_clients)
+        self.len_clients = len(self.object_clients)
+        self.len_sqrt = int(np.sqrt(self.len_clients))
+        self.rows_clients = int(self.len_clients / self.len_sqrt)
+        self.cols_clients = int(self.len_sqrt)
+        self.matrix_clients = self.object_clients.reshape((self.rows_clients, self.cols_clients))
+
+        self.tr = np.transpose(self.matrix_clients)
+        self.demand_clients_edit.setText(str(len(self.tr[0])))
+
+        self.object_price = self.object["cena"]
+        self.object_price = self.object["cena"].to_numpy()
+        self.object_price_size = len(self.object_price)
+        self.len_price = len(self.object_price)
+        self.len_sqrt = int(np.sqrt(self.len_price))
+        self.rows_price = int(self.len_price / self.len_sqrt)
+        self.cols_price = int(self.len_sqrt)
+        self.matrix_price = self.object_price.reshape((self.rows_price, self.cols_price))
+
+        self.object_distance = self.object["dystans"]
+        self.object_distance = self.object["dystans"].to_numpy()
+        self.object_distance_size = len(self.object_distance)
+        self.len_distance = len(self.object_distance)
+        self.len_sqrt = int(np.sqrt(self.len_distance))
+        self.rows_distance = int(self.len_distance / self.len_sqrt)
+        self.cols_distance = int(self.len_sqrt)
+        self.matrix_distance = self.object_distance.reshape((self.rows_distance, self.cols_distance))
+
+        self.update_matrix(self.flag, self.matrix_producents, self.matrix_clients, self.matrix_price, self.matrix_distance)
+        
+        
+        
     def eventFilter(self, obj, event):
         if obj == self.central_widget and event.type() == QEvent.MouseButtonPress:
             if self.menu_frame.isVisible() and self.menu_frame.geometry().contains(event.globalPos()):
@@ -728,8 +796,8 @@ class Application(QWidget):
         y = int(y_text)
         self.matrix_demand_producents = [[0]*self.number_check for i in range(self.number_check)]
         self.matrix_demand_clients = [[0]*self.number_check for i in range(self.number_check)]
-        self.matrix_price = [[0]*self.number_check for i in range(self.number_check)]
-        self.matrix_distance = [[0] * self.number_check for i in range(self.number_check)]
+        self.matrix_price_app = [[0]*self.number_check for i in range(self.number_check)]
+        self.matrix_distance_app = [[0] * self.number_check for i in range(self.number_check)]
         k = 0
         for i in range(x):
             for j in range(z):
@@ -743,12 +811,12 @@ class Application(QWidget):
         k = 0
         for i in range(x):
             for j in range(z):
-                self.matrix_price[i][j] = self.lineedit_price[k].text()
+                self.matrix_price_app[i][j] = self.lineedit_price[k].text()
                 k += 1
         k = 0
         for i in range(x):
             for j in range(z):
-                self.matrix_distance[i][j] = self.lineedit_distance[k].text()
+                self.matrix_distance_app[i][j] = self.lineedit_distance[k].text()
                 k += 1
         
                 
