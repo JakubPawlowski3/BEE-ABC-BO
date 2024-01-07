@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import Qt, QRect, QPropertyAnimation
-from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QFrame, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
+from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent
+from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QFrame, QButtonGroup, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
 from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator
 import pandas as pd
 
@@ -75,6 +75,8 @@ class Application(QWidget):
         self.main_layout.addLayout(self.layoutV1)
         self.setLayout(self.main_layout)
 
+        self.central_widget.installEventFilter(self)
+        
         self.stack_main_widget = QStackedWidget(self.central_widget)
         self.stack_main_widget.addWidget(self.main_page)
         
@@ -283,6 +285,7 @@ class Application(QWidget):
         self.validator = QIntValidator(self)
         self.set_product.setValidator(self.validator)
         self.parameters_layoutH.addWidget(self.set_product, alignment=Qt.AlignTop)
+        self.validator = QIntValidator(self)
 
 
         self.bee_employee = QLabel("Wpisz liczbe pszczol pracujacych", self.parameters_page)
@@ -373,7 +376,7 @@ class Application(QWidget):
         self.set_criterium.textChanged.connect(self.update_text_C)
         self.diagram_text_C.setStyleSheet('color:white')
 
-        self.set_product.textChanged.connect(self.upgrade_product)
+        
         self.checkboxes = []
         
 
@@ -407,6 +410,7 @@ class Application(QWidget):
         self.demand_layoutH3 = QHBoxLayout()
         self.demand_layoutH4 = QHBoxLayout()
         self.demand_layoutH5 = QHBoxLayout()
+        self.demand_layoutH6 = QHBoxLayout()
         self.demand_grid_layout = QGridLayout(self.demand_page)
         self.demand_grid_layout2 = QGridLayout(self.demand_page)
         self.demand_text = QLabel("Uzupełnij macierz zaoptrzebowania klientów", self.demand_frame)
@@ -427,14 +431,29 @@ class Application(QWidget):
         self.demand_layoutH2.addWidget(self.demand_producents_edit)
         self.demand_layoutH3.addWidget(self.demand_clients)
         self.demand_layoutH3.addWidget(self.demand_clients_edit)
+
+        self.set_text = QLabel("Wpisz ilosc produktow", self.demand_page)
+        self.set_text.setStyleSheet('color: white')
+        self.demand_layoutH6.addWidget(self.set_text, alignment=Qt.AlignTop)
+
+
+        
+        self.set_product = QLineEdit(self.demand_page)
+        self.set_product.setStyleSheet('background-color: white')
+        self.validator = QIntValidator(self)
+        self.set_product.setValidator(self.validator)
+        self.demand_layoutH6.addWidget(self.set_product, alignment=Qt.AlignTop)
+        self.set_product.textChanged.connect(self.upgrade_product)
         
 
 
-        self.lineedit = []
+
         self.demand_producents_edit.textChanged.connect(self.update_matrix)
         self.demand_clients_edit.textChanged.connect(self.update_matrix)
 
-        
+
+
+        self.demand_frame_layout.addLayout(self.demand_layoutH6)
         self.demand_frame_layout.addLayout(self.demand_layoutH3)
         self.demand_frame_layout.addLayout(self.demand_layoutH2)
         self.demand_frame_layout.addLayout(self.demand_layoutH5)
@@ -442,6 +461,7 @@ class Application(QWidget):
         self.demand_frame_layout.addLayout(self.demand_grid_layout)
         self.demand_frame_layout.addLayout(self.demand_layoutH1)
         self.demand_frame_layout.addLayout(self.demand_grid_layout2)
+        self.demand_frame_layout.addStretch(100)
         self.demand_page.setLayout(self.demand_frame_layout)
 
         #######
@@ -464,9 +484,15 @@ class Application(QWidget):
         self.price_frame_layout.addLayout(self.price_layoutH3)
         self.price_frame_layout.addLayout(self.price_layoutH4)
         self.price_frame_layout.addLayout(self.price_grid_layout)
+        self.price_frame_layout.addStretch(100)
         self.price_page.setLayout(self.price_frame_layout)
 
 #######
+        self.lineedit_demand_producents = []
+        self.lineedit_demand_clients = []
+        self.lineedit_price = []
+        self.lineedit_distance = []
+
 ##### distance page
 
         self.distance_frame_layout = QVBoxLayout(self.distance_frame)
@@ -486,10 +512,11 @@ class Application(QWidget):
         self.distance_frame_layout.addLayout(self.distance_layoutH3)
         self.distance_frame_layout.addLayout(self.distance_layoutH4)
         self.distance_frame_layout.addLayout(self.distance_grid_layout)
+        self.distance_frame_layout.addStretch(100)
         self.distance_page.setLayout(self.distance_frame_layout)
 
 
-        
+
 
         self.menu_animation = QPropertyAnimation(self.menu_frame, b"geometry")
         self.menu_animation.setDuration(self.animation_duration)
@@ -575,6 +602,7 @@ class Application(QWidget):
         self.diagram_text_C.setText(text)
     def upgrade_product(self, text):
         self.number_check = int(text)
+        self.button_group= QButtonGroup()
 
         for checkbox in self.checkboxes:
             checkbox.setParent(None)
@@ -583,6 +611,8 @@ class Application(QWidget):
         self.checkboxes = [QCheckBox(f'Produkt{i+1}') for i in range(self.number_check)]
         for checkbox in self.checkboxes:
             checkbox.setStyleSheet('color: white')
+            self.button_group.addButton(checkbox)
+            self.button_group.setExclusive(True)
             self.diagram_layoutH5.addWidget(checkbox)
 
         # for lineedit in self.lineedit:
@@ -596,7 +626,10 @@ class Application(QWidget):
         #     self.demand_frame_layout.addLayout(self.demandH[lineedit])
 
     def update_matrix(self):
-        # Usuń poprzednie QLineEdit z macierzy
+        self.lineedit_demand_producents = []
+        self.lineedit_demand_clients = []
+        self.lineedit_price = []
+        self.lineedit_distance = []
         for i in reversed(range(self.demand_grid_layout.count())):
             item = self.demand_grid_layout.itemAt(i)
             widget = item.widget()
@@ -629,21 +662,23 @@ class Application(QWidget):
         z = int(z_text)
         x = int(x_text)
         y = int(y_text)
-
-        # Stwórz i dodaj nową macierz QLineEdit zgodnie z wartościami x i y
+        
         for i in range(x):
             for j in range(z):
                 lineedit = QLineEdit(self.demand_frame)
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                self.lineedit_demand_producents.append(lineedit)
                 self.demand_grid_layout.addWidget(lineedit, i, j)
+        
         for i in range(y):
             for j in range(z):
                 lineedit = QLineEdit(self.demand_frame)
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                self.lineedit_demand_clients.append(lineedit)
                 self.demand_grid_layout2.addWidget(lineedit, i, j)
         for i in range(x):
             for j in range(z):
@@ -651,6 +686,7 @@ class Application(QWidget):
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                self.lineedit_price.append(lineedit)
                 self.price_grid_layout.addWidget(lineedit, i, j)
         for i in range(y):
             for j in range(x):
@@ -658,13 +694,68 @@ class Application(QWidget):
                 validator = QIntValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
+                self.lineedit_distance.append(lineedit)
                 self.distance_grid_layout.addWidget(lineedit, i, j)
-
+ 
+        for edit in self.lineedit_demand_producents:
+            edit.textChanged.connect(self.update_edit)
+        for edit in self.lineedit_demand_clients:
+            edit.textChanged.connect(self.update_edit)
+        for edit in self.lineedit_price:
+            edit.textChanged.connect(self.update_edit)
+        for edit in self.lineedit_distance:
+            edit.textChanged.connect(self.update_edit)
     def Import(self):
         response = QFileDialog.getOpenFileName(parent=self, caption='Wybierz plik')
 
+    def eventFilter(self, obj, event):
+        if obj == self.central_widget and event.type() == QEvent.MouseButtonPress:
+            if self.menu_frame.isVisible() and self.menu_frame.geometry().contains(event.globalPos()):
+                self.slidemenu()
+                return True  # Dodaj to, aby zatrzymać dalsze przetwarzanie zdarzenia
+        return super().eventFilter(obj, event)
 
+    def update_edit(self):
+        z_text = self.set_product.text()
+        x_text = self.demand_producents_edit.text()
+        y_text = self.demand_clients_edit.text()
+
+        if not x_text or not y_text or not z_text:
+            return
+
+        z = int(z_text)
+        x = int(x_text)
+        y = int(y_text)
+        self.matrix_demand_producents = [[0]*self.number_check for i in range(self.number_check)]
+        self.matrix_demand_clients = [[0]*self.number_check for i in range(self.number_check)]
+        self.matrix_price = [[0]*self.number_check for i in range(self.number_check)]
+        self.matrix_distance = [[0] * self.number_check for i in range(self.number_check)]
+        k = 0
+        for i in range(x):
+            for j in range(z):
+                self.matrix_demand_producents[i][j] = self.lineedit_demand_producents[k].text()
+                k += 1
+        k = 0
+        for i in range(x):
+            for j in range(z):
+                self.matrix_demand_clients[i][j] = self.lineedit_demand_clients[k].text()
+                k += 1
+        k = 0
+        for i in range(x):
+            for j in range(z):
+                self.matrix_price[i][j] = self.lineedit_price[k].text()
+                k += 1
+        k = 0
+        for i in range(x):
+            for j in range(z):
+                self.matrix_distance[i][j] = self.lineedit_distance[k].text()
+                k += 1
         
+                
+        for row in self.matrix_demand_clients:
+            print(row)
+        
+
 app = QApplication([])
 
 login = Application()
