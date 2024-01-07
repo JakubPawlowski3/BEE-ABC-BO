@@ -11,8 +11,7 @@ class Producent():
         self.quantity = quantity
 
 class Bee():
-    def __init__(self, product, matrix_producents, matrix_customers, number_products, number_customers, number_bees, number_observator, restricition, producents, price, distance):
-        self.product = product
+    def __init__(self, matrix_producents, matrix_customers, number_products, number_customers, number_bees, number_observator, restricition, producents, price, distance):
         self.matrix_producents = matrix_producents
         self.matrix_customers = matrix_customers
         self.number_products = number_products
@@ -25,34 +24,33 @@ class Bee():
         self.distance = distance
 
     def function(self, distribuation):
-            k = self.product - 1
             m = len(self.matrix_producents[0])
             n = len(distribuation[0])
             value = 0
             matrix = [[0] * m for i in range(n)]
             for i in range(n):
                 for j in range(m):
-                    if distribuation[i][j] >= 0.1 * self.matrix_producents[j][k]:
-                        matrix[i][j] = distribuation[i][j] * self.price[j][k]
+                    if distribuation[i][j] >= 0.1 * self.matrix_producents[j][0]:
+                        matrix[i][j] = distribuation[i][j] * self.price[j][0]
                     else:
-                        matrix[i][j] = distribuation[i][j] * self.price[j][k] + 0.45 * self.distance[i][j]
+                        matrix[i][j] = distribuation[i][j] * self.price[j][0] + 0.45 * self.distance[i][j]
                     value += matrix[i][j]
                     value = round(value, 5)
             return value
-    
+
     def function_efficency(self, value):
             value_eff = 1 / (1 + value)
             value_eff = round(value_eff, 5)
-                    
+
             return value_eff
-        
+
 
     def correct_position(self, new_bee):
-            
+
             counter=0
             kolumny = np.sum(new_bee, axis=0)
             wiersze = np.sum(new_bee, axis=1)
-            
+
             while not(np.all(self.restricition == wiersze) and np.all(kolumny <= self.producents)):
                 a=np.shape(new_bee)[0]
                 b=np.shape(new_bee)[1]
@@ -81,8 +79,8 @@ class Bee():
                     new_bee=np.squeeze(new_bee)
                     return new_bee
             return new_bee
-        
-        
+
+
     def generate_matrix_production(self, producents, n):
 
             matrixes = []
@@ -117,8 +115,8 @@ class Bee():
                 vector_eff.append(self.function_efficency(vector[i]))
 
             return matrixes, vector, vector_eff    
-        
-        
+
+
     def generate_neighbours(self, matrix):
         n = len(matrix)
         neighbours_matrix = np.zeros(np.shape(matrix))
@@ -142,20 +140,14 @@ class Bee():
                     counter_list[i] += 1
             matrixes = list_neighbours
             return matrixes, vector, eff, counter_list
-        
+
     def onlooker_bees(self, matrixes, vector, eff, counter_list, ob):
             counter = 0
             counter_help = 0
             matrixes1 = np.array(matrixes[0])
-            if ob < len(eff):
-                list_position = [np.zeros(np.shape(matrixes1)) for i in range(len(eff))]
-                list_value = [0 for i in range(len(eff))]
-                list_efficency = [0 for i in range(len(eff))]
-            else:
-                list_position = [np.zeros(np.shape(matrixes1)) for i in range(ob)]
-                list_value = [0 for i in range(ob)]
-                list_efficency = [0 for i in range(ob)]
-            
+            list_position = [np.zeros(np.shape(matrixes1)) for i in range(len(eff))]
+            list_value = [0 for i in range(len(eff))]
+            list_efficency = [0 for i in range(len(eff))]
             list_probability = [0 for i in range(len(eff))]
             for i in range(len(eff)):
                 list_probability[i] = eff[i] / np.sum(eff)
@@ -188,9 +180,9 @@ class Bee():
                     vector[i] = vec
                     eff[i] = eff1
                     counter_list[i] = 0
-                
+
             return matrixes, np.squeeze(vector), np.squeeze(eff), counter_list
-        
+
 
     def ABC(self, limit, limit_iter):
             population, vec, vec_eff = self.generate_matrix_production(self.matrix_producents, self.number_bees)
@@ -218,28 +210,18 @@ dystans=[[5,22,11],[100,55,30],[22,10,15]]
 ograniczenia=[23,21,33]
 produkcja=[45,40,1000]
 macierz_test = np.array([[3, 5, 6], [17, 10, 2], [11, 17, 7]])
-product = 2
-def get_restriction(customers, producents, k):
-    help_customers = np.transpose(customers)
-    help_producents = np.transpose(producents)
-    producents = help_producents[k - 1]
-    restricition = help_customers[k - 1]
-    return producents, restricition
-produkcja, ograniczenia = get_restriction(klienci, producenci, product)
-print(produkcja, ograniczenia)
-number_bees = 10
+number_bees = 100
 number_observator = 20
 number_products = 3
 number_customers = 3
-bee = Bee(product, producenci, klienci, number_products, number_customers, number_bees, number_observator, ograniczenia, produkcja, cena, dystans)
-popultaion_best,vector_best,fitness_value=bee.ABC(10, 10)
+bee = Bee(producenci, klienci, number_products, number_customers, number_bees, number_observator, ograniczenia, produkcja, cena, dystans)
+popultaion_best,vector_best,fitness_value=bee.ABC(10, 100)
 
 print("Jakub Pawłowski obliczył, że najlepsze jest dopasowanie: ", "\n")
 print(popultaion_best, "\n")
 print("najlepsza wartość funkcji celu jest równa:  ", "\n")
 print(fitness_value)
-print("Wektor\n")
+print("wektor\n")
 print(vector_best)
 
 y=bee.function(popultaion_best)
-
