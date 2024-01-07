@@ -2,10 +2,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent
+from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, QThread, Signal
 from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QFrame, QButtonGroup, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
 from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator
 import pandas as pd
+from bee_class import *
+
+
+class WorkerThread(QThread):
+    finished = Signal()
+
+    def __init__(self, iteration, criterium, product, matrix_producents_app, matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, production, restriction, matrix_price_app, matrix_distance_app):
+        super().__init__()
+        self.iteration = iteration
+        self.criterium = criterium
+        self.product = product
+        self.matrix_producents_app = matrix_producents_app
+        self.matrix_clients_app = matrix_clients_app
+        self.number_producents = number_producents
+        self.number_clients = number_clients
+        self.employee_bee = employee_bee
+        self.observator_bee = observator_bee
+        self.production = production
+        self.restriction = restriction
+        self.matrix_price_app = matrix_price_app
+        self.matrix_distance_app = matrix_distance_app
+
+
+    def run(self):
+        bee = Bee(
+            self.product, self.matrix_producents_app, self.matrix_clients_app,
+            self.number_producents, self.number_clients,
+            self.employee_bee, self.observator_bee,
+            self.production, self.restriction,
+            self.matrix_price_app, self.matrix_distance_app
+        )
+        population, vector, fitness = bee.ABC(self.criterium, self.iteration)
+        self.finished.emit()
 
 class Canvas(FigureCanvas):
     def __init__(self):
@@ -274,17 +307,11 @@ class Application(QWidget):
         self.parameters_layoutH3 = QHBoxLayout()
         self.parameters_layoutH4 = QHBoxLayout()
         self.parameters_frame_layout = QVBoxLayout(self.parameters_frame)
-        self.set_text = QLabel("Wpisz ilosc produktow", self.parameters_page)
-        self.set_text.setStyleSheet('color: white')
-        self.parameters_layoutH.addWidget(self.set_text, alignment=Qt.AlignTop)
+
 
 
         
-        self.set_product = QLineEdit(self.parameters_page)
-        self.set_product.setStyleSheet('background-color: white')
-        self.validator = QIntValidator(self)
-        self.set_product.setValidator(self.validator)
-        self.parameters_layoutH.addWidget(self.set_product, alignment=Qt.AlignTop)
+
         self.validator = QIntValidator(self)
 
 
@@ -338,9 +365,12 @@ class Application(QWidget):
         self.diagram_layoutH3 = QHBoxLayout()
         self.diagram_layoutH4 = QHBoxLayout()
         self.diagram_layoutH5 = QHBoxLayout()
+        self.diagram_layoutH6 = QHBoxLayout()
+        self.diagram_layoutH7 = QHBoxLayout()
         self.diagram_button_generate = QPushButton("Generuj rozwiazanie", self.diagram_frame)
         self.diagram_button_generate.setStyleSheet('background-color: white')
         self.diagram_frame_layout.addWidget(self.diagram_button_generate, alignment=Qt.AlignTop)
+        self.diagram_button_generate.clicked.connect(self.Generate_ABC)
         
 
 
@@ -389,6 +419,13 @@ class Application(QWidget):
         self.diagram_layoutH3.addStretch(20)
         self.diagram_layoutH4.addStretch(20)
 
+        self.diagram_production = QLabel("Produkcja wybranego produktu", self.diagram_page)
+        self.diagram_restriction = QLabel("Zapotrzebowanie na dany produkt", self.diagram_page)
+        self.diagram_production.setStyleSheet('color: white')
+        self.diagram_restriction.setStyleSheet('color: white')
+        self.diagram_layoutH6.addWidget(self.diagram_production)
+        self.diagram_layoutH7.addWidget(self.diagram_restriction)
+
         
 
         
@@ -398,8 +435,10 @@ class Application(QWidget):
         self.diagram_frame_layout.addLayout(self.diagram_layoutH3)
         self.diagram_frame_layout.addLayout(self.diagram_layoutH4)
         self.diagram_frame_layout.addLayout(self.diagram_layoutH5)
+        self.diagram_frame_layout.addLayout(self.diagram_layoutH6)
+        self.diagram_frame_layout.addLayout(self.diagram_layoutH7)
         self.diagram_page.setLayout(self.diagram_frame_layout)
-
+        
 
         ############
 
@@ -411,6 +450,8 @@ class Application(QWidget):
         self.demand_layoutH4 = QHBoxLayout()
         self.demand_layoutH5 = QHBoxLayout()
         self.demand_layoutH6 = QHBoxLayout()
+        self.demand_layoutH7 = QHBoxLayout()
+        self.demand_layoutH8 = QHBoxLayout()
         self.demand_grid_layout = QGridLayout(self.demand_page)
         self.demand_grid_layout2 = QGridLayout(self.demand_page)
         self.demand_text = QLabel("Uzupełnij macierz zaoptrzebowania klientów", self.demand_frame)
@@ -451,6 +492,7 @@ class Application(QWidget):
         self.demand_producents_edit.textChanged.connect(self.update_matrix)
         self.demand_clients_edit.textChanged.connect(self.update_matrix)
 
+    
 
 
         self.demand_frame_layout.addLayout(self.demand_layoutH6)
@@ -524,6 +566,40 @@ class Application(QWidget):
         
             
         self.show()
+    def get_restriction(self, customers, producents, k):
+        help_customers = np.transpose(customers)
+        help_producents = np.transpose(producents)
+        producents = help_producents[k - 1]
+        restricition = help_customers[k - 1]
+        return producents, restricition
+    def Generate_ABC(self):
+        k = 0
+        product = 0
+        for check in self.checkboxes:
+            self.list_check[k] = check.isChecked()
+            k+=1
+        for check in self.list_check:
+            if check == True:
+                product = self.list_check.index(check)
+        product += 1
+        k = 0
+        production, restriction = self.get_restriction(self.matrix_clients_app, self.matrix_producents_app, product)
+        number_producents = int(self.demand_producents_edit.text())
+        number_clients = int(self.demand_clients_edit.text())
+        employee_bee = int(self.set_employee_bee.text())
+        observator_bee = int(self.set_observator_bee.text())
+        criterium = int(self.set_criterium.text())
+        iteration = int(self.set_iteration.text())
+        print(type(self.matrix_producents_app[0][0]))
+        print(type(self.matrix_clients_app[0][0]))
+        print(type(self.matrix_price_app[0][0]))
+        print(type(self.matrix_distance_app[0][0]))
+       # print(product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, production, restriction, self.matrix_price_app, self.matrix_distance_app, iteration, criterium)
+        self.thread = WorkerThread(iteration, criterium, product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, production, restriction, self.matrix_price_app, self.matrix_distance_app)
+        self.thread.finished.connect(self.thread_finished)
+        self.thread.start()
+    def thread_finished():
+        print("Finished")
 
     def slidemenu(self):
         if self.menu_animation.state() == QPropertyAnimation.Running:
@@ -607,13 +683,18 @@ class Application(QWidget):
         for checkbox in self.checkboxes:
             checkbox.setParent(None)
             checkbox.deleteLater()
-
+        self.list_check = [0 for i in range(self.number_check)]
         self.checkboxes = [QCheckBox(f'Produkt{i+1}') for i in range(self.number_check)]
+        k = 0
         for checkbox in self.checkboxes:
             checkbox.setStyleSheet('color: white')
             self.button_group.addButton(checkbox)
             self.button_group.setExclusive(True)
+            self.list_check[k]= checkbox.isChecked()
             self.diagram_layoutH5.addWidget(checkbox)
+            k +=1
+        k = 0
+        print(self.list_check)
 
         # for lineedit in self.lineedit:
         #     lineedit.setParent(None)
@@ -736,10 +817,10 @@ class Application(QWidget):
         self.len_sqrt = int(np.sqrt(self.len_producents))
         self.rows_producents = int(self.len_producents / self.len_sqrt)
         self.cols_producents = int(self.len_sqrt)
-        self.matrix_producents = self.object_producents.reshape((self.rows_producents, self.cols_producents))
+        self.matrix_producents_app = self.object_producents.reshape((self.rows_producents, self.cols_producents))
 
-        self.set_product.setText(str(len(self.matrix_producents[0])))
-        self.tr = np.transpose(self.matrix_producents)
+        self.set_product.setText(str(len(self.matrix_producents_app[0])))
+        self.tr = np.transpose(self.matrix_producents_app)
         self.demand_producents_edit.setText(str(len(self.tr[0])))
 
         self.object_clients = self.object["klienci"]
@@ -749,9 +830,9 @@ class Application(QWidget):
         self.len_sqrt = int(np.sqrt(self.len_clients))
         self.rows_clients = int(self.len_clients / self.len_sqrt)
         self.cols_clients = int(self.len_sqrt)
-        self.matrix_clients = self.object_clients.reshape((self.rows_clients, self.cols_clients))
+        self.matrix_clients_app = self.object_clients.reshape((self.rows_clients, self.cols_clients))
 
-        self.tr = np.transpose(self.matrix_clients)
+        self.tr = np.transpose(self.matrix_clients_app)
         self.demand_clients_edit.setText(str(len(self.tr[0])))
 
         self.object_price = self.object["cena"]
@@ -761,7 +842,7 @@ class Application(QWidget):
         self.len_sqrt = int(np.sqrt(self.len_price))
         self.rows_price = int(self.len_price / self.len_sqrt)
         self.cols_price = int(self.len_sqrt)
-        self.matrix_price = self.object_price.reshape((self.rows_price, self.cols_price))
+        self.matrix_price_app = self.object_price.reshape((self.rows_price, self.cols_price))
 
         self.object_distance = self.object["dystans"]
         self.object_distance = self.object["dystans"].to_numpy()
@@ -770,12 +851,14 @@ class Application(QWidget):
         self.len_sqrt = int(np.sqrt(self.len_distance))
         self.rows_distance = int(self.len_distance / self.len_sqrt)
         self.cols_distance = int(self.len_sqrt)
-        self.matrix_distance = self.object_distance.reshape((self.rows_distance, self.cols_distance))
+        self.matrix_distance_app = self.object_distance.reshape((self.rows_distance, self.cols_distance))
 
-        self.update_matrix(self.flag, self.matrix_producents, self.matrix_clients, self.matrix_price, self.matrix_distance)
+        self.update_matrix(self.flag, self.matrix_producents_app, self.matrix_clients_app, self.matrix_price_app, self.matrix_distance_app)
         
         
-        
+    
+
+
     def eventFilter(self, obj, event):
         if obj == self.central_widget and event.type() == QEvent.MouseButtonPress:
             if self.menu_frame.isVisible() and self.menu_frame.geometry().contains(event.globalPos()):
@@ -822,6 +905,8 @@ class Application(QWidget):
                 
         for row in self.matrix_demand_clients:
             print(row)
+            
+    
         
 
 app = QApplication([])
