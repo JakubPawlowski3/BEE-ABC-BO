@@ -38,10 +38,10 @@ class Bee():
             matrix = [[0] * m for i in range(n)]
             for i in range(n):
                 for j in range(m):
-                    if distribuation[i][j] >= 0.1 * self.matrix_producents[j][0]:
-                        matrix[i][j] = distribuation[i][j] * self.price[j][0]
+                    if distribuation[i][j] >= 0.1 * self.matrix_producents[j][k]:
+                        matrix[i][j] = distribuation[i][j] * self.price[j][k]
                     else:
-                        matrix[i][j] = distribuation[i][j] * self.price[j][0] + 0.45 * self.distance[i][j]
+                        matrix[i][j] = distribuation[i][j] * self.price[j][k] + 0.45 * self.distance[i][j]
                     value += matrix[i][j]
                     value = round(value, 5)
             return value
@@ -1180,34 +1180,33 @@ class Application(QWidget):
         z = int(z_text)
         x = int(x_text)
         y = int(y_text)
-        self.matrix_demand_producents = [[0]*self.number_check for i in range(self.number_check)]
-        self.matrix_demand_clients = [[0]*self.number_check for i in range(self.number_check)]
+        self.matrix_producents_app = [[0]*self.number_check for i in range(self.number_check)]
+        self.matrix_clients_app = [[0]*self.number_check for i in range(self.number_check)]
         self.matrix_price_app = [[0]*self.number_check for i in range(self.number_check)]
         self.matrix_distance_app = [[0] * self.number_check for i in range(self.number_check)]
         k = 0
         for i in range(x):
             for j in range(z):
-                self.matrix_demand_producents[i][j] = self.lineedit_demand_producents[k].text()
+                self.matrix_producents_app[i][j] = int(self.lineedit_demand_producents[k].text())
                 k += 1
         k = 0
         for i in range(x):
             for j in range(z):
-                self.matrix_demand_clients[i][j] = self.lineedit_demand_clients[k].text()
+                self.matrix_clients_app[i][j] = int(self.lineedit_demand_clients[k].text())
                 k += 1
         k = 0
         for i in range(x):
             for j in range(z):
-                self.matrix_price_app[i][j] = self.lineedit_price[k].text()
+                self.matrix_price_app[i][j] = int(self.lineedit_price[k].text())
                 k += 1
         k = 0
         for i in range(x):
             for j in range(z):
-                self.matrix_distance_app[i][j] = self.lineedit_distance[k].text()
+                self.matrix_distance_app[i][j] = int(self.lineedit_distance[k].text())
                 k += 1
         
                 
-        for row in self.matrix_demand_clients:
-            print(row)
+
             
     
         
