@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, QThread, Signal
-from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QFrame, QButtonGroup, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
+from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QMessageBox,QFrame, QButtonGroup, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
 from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator
 import pandas as pd
 import random
@@ -97,6 +97,7 @@ class Bee():
                 matrix = np.zeros((self.number_customers, self.number_products), dtype=int)
 
                 for j in range(self.number_customers):
+                   
                     value = self.restricition[j]
                     for i in range(self.number_products):
                         if i == self.number_products - 1:
@@ -469,6 +470,10 @@ class Application(QWidget):
         self.layout_menuH7.addWidget(self.result)
         self.layout_menuH7.addStretch(20)
 
+        self.menu_lab = QLabel(self.menu_frame)
+        self.menu_lab.setFixedSize(40, 100)
+        self.menu_layout.addWidget(self.menu_lab)
+
 
         self.menu_layout.addLayout(self.layout_menuH1)
         self.menu_layout.addLayout(self.layout_menuH2)
@@ -477,6 +482,7 @@ class Application(QWidget):
         self.menu_layout.addLayout(self.layout_menuH5)
         self.menu_layout.addLayout(self.layout_menuH6)
         self.menu_layout.addLayout(self.layout_menuH7)
+        self.menu_layout.addStretch(1000)
 
         
         self.result.hide()
@@ -549,6 +555,7 @@ class Application(QWidget):
         self.parameters_layoutH2 = QHBoxLayout()
         self.parameters_layoutH3 = QHBoxLayout()
         self.parameters_layoutH4 = QHBoxLayout()
+        self.parameters_layoutH5 = QHBoxLayout()
         self.parameters_frame_layout = QVBoxLayout(self.parameters_frame)
 
 
@@ -589,13 +596,20 @@ class Application(QWidget):
         self.set_iteration.setStyleSheet('background-color: white')
         self.set_iteration.setValidator(self.validator)
         self.parameters_layoutH4.addWidget(self.set_iteration, alignment=Qt.AlignTop)
-        
+
+        self.parameters_icon = QLabel(self.parameters_page)
+        self.parameters_icon_bee = QPixmap('param.png')
+        self.parameters_icon_bee_scaled = self.parameters_icon_bee.scaled(self.parameters_icon_bee.width() // 1.8, self.parameters_icon_bee.height() // 1.8, Qt.KeepAspectRatio)
+        self.parameters_icon.setPixmap(self.parameters_icon_bee_scaled)
+        self.parameters_layoutH5.addWidget(self.parameters_icon, alignment = Qt.AlignCenter)
+
 
         self.parameters_frame_layout.addLayout(self.parameters_layoutH)
         self.parameters_frame_layout.addLayout(self.parameters_layoutH1)
         self.parameters_frame_layout.addLayout(self.parameters_layoutH2)
         self.parameters_frame_layout.addLayout(self.parameters_layoutH3)
         self.parameters_frame_layout.addLayout(self.parameters_layoutH4)
+        self.parameters_frame_layout.addLayout(self.parameters_layoutH5)
         self.parameters_frame_layout.addStretch(100)
         self.parameters_page.setLayout(self.parameters_frame_layout)
         
@@ -661,17 +675,8 @@ class Application(QWidget):
         self.diagram_layoutH2.addStretch(20)
         self.diagram_layoutH3.addStretch(20)
         self.diagram_layoutH4.addStretch(20)
+       
 
-        self.diagram_production = QLabel("Produkcja wybranego produktu", self.diagram_page)
-        self.diagram_restriction = QLabel("Zapotrzebowanie na dany produkt", self.diagram_page)
-        self.diagram_production.setStyleSheet('color: white')
-        self.diagram_restriction.setStyleSheet('color: white')
-        self.diagram_layoutH6.addWidget(self.diagram_production)
-        self.diagram_layoutH7.addWidget(self.diagram_restriction)
-
-        
-
-        
 
         self.diagram_frame_layout.addLayout(self.diagram_layoutH1)
         self.diagram_frame_layout.addLayout(self.diagram_layoutH2)
@@ -822,6 +827,7 @@ class Application(QWidget):
         self.result_frame_layout.addLayout(self.result_layoutH1)
         self.result_frame_layout.addLayout(self.result_grid_layout)
         self.result_page.setLayout(self.result_frame_layout)
+        self.result_page.setStyleSheet('border: 2px solid red')
         self.result_frame_layout.addStretch(20)
 
         self.menu_animation = QPropertyAnimation(self.menu_frame, b"geometry")
@@ -858,6 +864,7 @@ class Application(QWidget):
         iteration = int(self.set_iteration.text())
 
 
+
        
        # print(product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, production, restriction, self.matrix_price_app, self.matrix_distance_app)
         self.thread = WorkerThread(iteration, criterium, product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, restriction, production, self.matrix_price_app, self.matrix_distance_app)
@@ -865,7 +872,12 @@ class Application(QWidget):
         self.thread.start()
     def thread_finished(self):
         print("Thread finished.")
-        print(self.thread.fitness_value)
+   
+        self.mess_box = QMessageBox()
+        self.mess_box.setWindowTitle("Informacja")
+        self.mess_box.setText("Rozwiazanie znalezione!")
+        self.mess_box.setStandardButtons(QMessageBox.Ok)
+        self.mess_box.show()
         self.result.show()
         self.result_icon.show()
         self.result_fit.setText(str(self.thread.fitness_value))
@@ -921,7 +933,7 @@ class Application(QWidget):
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_parameters += 1
         self.number_products = self.set_employee_bee.text()
-        print(self.number_products)
+       
     def demand_ui(self):
         if self.stack_main_widget.currentWidget != self.demand_page:
             self.bee_label.hide()
@@ -930,7 +942,7 @@ class Application(QWidget):
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_demand += 1
-        print("clicked!")
+        
     def price_ui(self):
         if self.stack_main_widget.currentWidget != self.price_page:
             self.bee_label.hide()
@@ -939,7 +951,7 @@ class Application(QWidget):
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_price += 1
-        print("clicked!")
+        
     def distance_ui(self):
         if self.stack_main_widget.currentWidget != self.distance_page:
             self.bee_label.hide()
@@ -948,7 +960,7 @@ class Application(QWidget):
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         self.counter_distance += 1
-        print("clicked!")
+        
     def diagram_ui(self):
         # self.diagram_class = Canvas()
         # self.diagram_class.show()
@@ -964,7 +976,7 @@ class Application(QWidget):
             self.bee_label.show()
             self.stack_main_widget.setCurrentWidget(self.main_page)
         
-        print("clicked!")
+ 
     def result_ui(self):
         if self.stack_main_widget.currentWidget != self.result_page:
             self.bee_label.hide()
@@ -997,7 +1009,7 @@ class Application(QWidget):
             self.diagram_layoutH5.addWidget(checkbox)
             k +=1
         k = 0
-        print(self.list_check)
+       
 
         # for lineedit in self.lineedit:
         #     lineedit.setParent(None)
@@ -1059,7 +1071,7 @@ class Application(QWidget):
                     lineedit.setText('0')
                 self.lineedit_demand_producents.append(lineedit)
                 self.demand_grid_layout.addWidget(lineedit, i, j)
-        
+
         for i in range(y):
             for j in range(z):
                 lineedit = QLineEdit(self.demand_frame)
@@ -1071,6 +1083,7 @@ class Application(QWidget):
                 else:
                     lineedit.setText('0')
                 self.lineedit_demand_clients.append(lineedit)
+                
                 self.demand_grid_layout2.addWidget(lineedit, i, j)
         for i in range(x):
             for j in range(z):
@@ -1180,17 +1193,19 @@ class Application(QWidget):
         z = int(z_text)
         x = int(x_text)
         y = int(y_text)
-        self.matrix_producents_app = [[0]*self.number_check for i in range(self.number_check)]
-        self.matrix_clients_app = [[0]*self.number_check for i in range(self.number_check)]
-        self.matrix_price_app = [[0]*self.number_check for i in range(self.number_check)]
-        self.matrix_distance_app = [[0] * self.number_check for i in range(self.number_check)]
+        self.matrix_producents_app = [[0]*self.number_check for i in range(x)]
+        self.matrix_clients_app = [[0] * self.number_check for i in range(y)]
+    
+        self.matrix_price_app = [[0]*self.number_check for i in range(x)]
+        self.matrix_distance_app = [[0] * x for i in range(y)]
+
         k = 0
         for i in range(x):
             for j in range(z):
                 self.matrix_producents_app[i][j] = int(self.lineedit_demand_producents[k].text())
                 k += 1
         k = 0
-        for i in range(x):
+        for i in range(y):
             for j in range(z):
                 self.matrix_clients_app[i][j] = int(self.lineedit_demand_clients[k].text())
                 k += 1
