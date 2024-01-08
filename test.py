@@ -184,7 +184,7 @@ class Bee():
 
 
     def ABC(self, limit, limit_iter):
-            sum_produkcja=np.sum(self.production)
+            sum_produkcja=np.sum(self.producents)
             sum_ograniczenia=np.sum(self.restricition)
             if sum_ograniczenia > sum_produkcja:
                 print("Dane nie umożliwiają rozwiązania problemu")
@@ -206,10 +206,10 @@ class Bee():
             return population_best, vector_best, fitness_value
 
 
-producenci=np.array([[45,21,33],[40,40,26],[45,22,23]])
-klienci=np.array([[30,33,32],[33,32,23],[31,22,22]])
+producenci=np.array([[0,213,33],[0,40,26],[100,22,23]])
+klienci=np.array([[15,33,32],[30,32,23],[20,22,22],[1,10,12]])
 cena=np.array([[3,4,5],[1,7,4],[100,2,5]])
-dystans=[[5,22,11],[100,55,30],[22,10,15]]
+dystans=[[5,22,11],[100,55,30],[22,10,15],[2,3,25]]
 macierz_test = np.array([[3, 5, 6], [17, 10, 2], [11, 17, 7]])
 product = 1
 def get_restriction(customers, producents, k):
@@ -219,12 +219,12 @@ def get_restriction(customers, producents, k):
     restricition = help_customers[k - 1]
     return producents, restricition
 produkcja, ograniczenia = get_restriction(klienci, producenci, product)
-number_bees = 100
-number_observator = 5
+number_bees = 200
+number_observator = 30
 number_products = 3
-number_customers = 3
+number_customers = 4
 bee = Bee(product, producenci, klienci, number_products,number_customers, number_bees, number_observator, ograniczenia, produkcja, cena, dystans)
-popultaion_best,vector_best,fitness_value=bee.ABC(5, 200)
+popultaion_best,vector_best,fitness_value=bee.ABC(10, 1)
 
 print(popultaion_best, "\n")
 print(fitness_value, "\n")
