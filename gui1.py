@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, QThread, Signal
 from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QMessageBox,QFrame, QButtonGroup, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
-from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator
+from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator, QDoubleValidator
 import pandas as pd
 import random
 
@@ -255,7 +255,7 @@ class Canvas(FigureCanvas):
     def __init__(self, vector, iteration):
         self.vector = vector
         self.iteration = iteration
-        fig, self.ax = plt.subplots(figsize=(5, 4), dpi=200)
+        fig, self.ax = plt.subplots(figsize=(3, 3), dpi=200)
         super().__init__(fig)
         
 
@@ -307,7 +307,7 @@ class Application(QWidget):
         
     def setup(self):
         
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 1200, 720)
 
         #ustawienie layoutów####
         self.layoutV1 = QVBoxLayout()
@@ -467,7 +467,7 @@ class Application(QWidget):
 
         self.layout_menuH7.addWidget(self.result_icon)
         self.layout_menuH7.addWidget(self.result)
-        self.layout_menuH7.addStretch(20)
+        self.layout_menuH7.addStretch(10)
 
         self.menu_lab = QLabel(self.menu_frame)
         self.menu_lab.setFixedSize(40, 100)
@@ -570,6 +570,7 @@ class Application(QWidget):
         self.set_employee_bee = QLineEdit(self.parameters_page)
         self.set_employee_bee.setStyleSheet('background-color: white')
         self.set_employee_bee.setValidator(self.validator)
+        self.set_employee_bee.setText("1")
         self.parameters_layoutH1.addWidget(self.set_employee_bee, alignment=Qt.AlignTop)
 
         self.observator_employee = QLabel("Wpisz liczbe obserwatorow", self.parameters_page)
@@ -578,6 +579,7 @@ class Application(QWidget):
         self.set_observator_bee = QLineEdit(self.parameters_page)
         self.set_observator_bee.setStyleSheet('background-color: white')
         self.set_observator_bee.setValidator(self.validator)
+        self.set_observator_bee.setText("1")
         self.parameters_layoutH2.addWidget(self.set_observator_bee, alignment=Qt.AlignTop)
 
         self.criterium = QLabel("Wpisz ilosc iteracji przed porzuceniem", self.parameters_page)
@@ -586,6 +588,7 @@ class Application(QWidget):
         self.set_criterium = QLineEdit(self.parameters_page)
         self.set_criterium.setStyleSheet('background-color: white')
         self.set_criterium.setValidator(self.validator)
+        self.set_criterium.setText("1")
         self.parameters_layoutH3.addWidget(self.set_criterium, alignment=Qt.AlignTop)
 
         self.iteration = QLabel("Wpisz ilosc iteracji", self.parameters_page)
@@ -594,11 +597,12 @@ class Application(QWidget):
         self.set_iteration = QLineEdit(self.parameters_page)
         self.set_iteration.setStyleSheet('background-color: white')
         self.set_iteration.setValidator(self.validator)
+        self.set_iteration.setText("1")
         self.parameters_layoutH4.addWidget(self.set_iteration, alignment=Qt.AlignTop)
 
         self.parameters_icon = QLabel(self.parameters_page)
         self.parameters_icon_bee = QPixmap('param.png')
-        self.parameters_icon_bee_scaled = self.parameters_icon_bee.scaled(self.parameters_icon_bee.width() // 1.8, self.parameters_icon_bee.height() // 1.8, Qt.KeepAspectRatio)
+        self.parameters_icon_bee_scaled = self.parameters_icon_bee.scaled(self.parameters_icon_bee.width() // 2, self.parameters_icon_bee.height() // 2, Qt.KeepAspectRatio)
         self.parameters_icon.setPixmap(self.parameters_icon_bee_scaled)
         self.parameters_layoutH5.addWidget(self.parameters_icon, alignment = Qt.AlignCenter)
 
@@ -627,6 +631,12 @@ class Application(QWidget):
         self.diagram_button_generate.setStyleSheet('background-color: white')
         self.diagram_frame_layout.addWidget(self.diagram_button_generate, alignment=Qt.AlignTop)
         self.diagram_button_generate.clicked.connect(self.Generate_ABC)
+
+        self.diagram_icon = QLabel(self.diagram_page)
+        self.diagram_icon_bee = QPixmap('eng.png')
+        self.diagram_icon_bee_scaled = self.diagram_icon_bee.scaled(self.diagram_icon_bee.width() // 2.3, self.diagram_icon_bee.height() // 2.3, Qt.KeepAspectRatio)
+        self.diagram_icon.setPixmap(self.diagram_icon_bee_scaled)
+        self.diagram_frame_layout.addWidget(self.diagram_icon, alignment = Qt.AlignCenter)
         
 
 
@@ -674,6 +684,8 @@ class Application(QWidget):
         self.diagram_layoutH2.addStretch(20)
         self.diagram_layoutH3.addStretch(20)
         self.diagram_layoutH4.addStretch(20)
+        self.diagram_frame_layout.addStretch(30)
+        self.diagram_frame_layout.addSpacing(30)
        
 
 
@@ -685,6 +697,9 @@ class Application(QWidget):
         self.diagram_frame_layout.addLayout(self.diagram_layoutH6)
         self.diagram_frame_layout.addLayout(self.diagram_layoutH7)
         self.diagram_page.setLayout(self.diagram_frame_layout)
+        
+        self.diagram_frame_layout.addStretch(30)
+        self.diagram_frame_layout.addSpacing(30)
         
 
         ############
@@ -733,7 +748,11 @@ class Application(QWidget):
         self.demand_layoutH6.addWidget(self.set_product, alignment=Qt.AlignTop)
         self.set_product.textChanged.connect(self.upgrade_product)
         
-
+        self.demand_icon = QLabel(self.demand_page)
+        self.demand_icon_bee = QPixmap('demand_.png')
+        self.demand_icon_bee_scaled = self.demand_icon_bee.scaled(self.demand_icon_bee.width() // 2, self.demand_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.demand_icon.setPixmap(self.demand_icon_bee_scaled)
+        self.demand_layoutH7.addWidget(self.demand_icon, alignment = Qt.AlignCenter)
 
 
         self.demand_producents_edit.textChanged.connect(self.update_matrix)
@@ -750,6 +769,7 @@ class Application(QWidget):
         self.demand_frame_layout.addLayout(self.demand_grid_layout)
         self.demand_frame_layout.addLayout(self.demand_layoutH1)
         self.demand_frame_layout.addLayout(self.demand_grid_layout2)
+        self.demand_frame_layout.addLayout(self.demand_layoutH7)
         self.demand_frame_layout.addStretch(100)
         self.demand_page.setLayout(self.demand_frame_layout)
 
@@ -760,8 +780,14 @@ class Application(QWidget):
         self.price_layoutH2 = QHBoxLayout()
         self.price_layoutH3 = QHBoxLayout()
         self.price_layoutH4 = QHBoxLayout()
-        self.price_grid_layout = QGridLayout(self.price_frame)
+        self.price_layoutH5 = QHBoxLayout()
 
+        self.price_grid_layout = QGridLayout(self.price_frame)
+        self.price_icon = QLabel(self.price_page)
+        self.price_icon_bee = QPixmap('price.png')
+        self.price_icon_bee_scaled = self.price_icon_bee.scaled(self.price_icon_bee.width() // 2, self.price_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.price_icon.setPixmap(self.price_icon_bee_scaled)
+        self.price_layoutH5.addWidget(self.price_icon, alignment = Qt.AlignCenter)
 
 
         self.price_text = QLabel("Uzupełnij macierz kosztów", self.price_frame)
@@ -772,6 +798,7 @@ class Application(QWidget):
         self.price_frame_layout.addLayout(self.price_layoutH2)
         self.price_frame_layout.addLayout(self.price_layoutH3)
         self.price_frame_layout.addLayout(self.price_layoutH4)
+        self.price_frame_layout.addLayout(self.price_layoutH5)
         self.price_frame_layout.addLayout(self.price_grid_layout)
         self.price_frame_layout.addStretch(100)
         self.price_page.setLayout(self.price_frame_layout)
@@ -789,6 +816,7 @@ class Application(QWidget):
         self.distance_layoutH2 = QHBoxLayout()
         self.distance_layoutH3 = QHBoxLayout()
         self.distance_layoutH4 = QHBoxLayout()
+        self.distance_layoutH5 = QHBoxLayout()
         self.distance_grid_layout = QGridLayout(self.distance_frame)
 
 
@@ -796,10 +824,18 @@ class Application(QWidget):
         self.distance_text.setStyleSheet('color: white')
         self.distance_layoutH2.addWidget(self.distance_text)
 
+        self.distance_icon = QLabel(self.distance_page)
+        self.distance_icon_bee = QPixmap('distance.png')
+        self.distance_icon_bee_scaled = self.distance_icon_bee.scaled(self.distance_icon_bee.width() // 2, self.distance_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.distance_icon.setPixmap(self.distance_icon_bee_scaled)
+        self.distance_layoutH5.addWidget(self.distance_icon, alignment = Qt.AlignCenter)
+
+
         self.distance_frame_layout.addLayout(self.distance_layoutH1)
         self.distance_frame_layout.addLayout(self.distance_layoutH2)
         self.distance_frame_layout.addLayout(self.distance_layoutH3)
         self.distance_frame_layout.addLayout(self.distance_layoutH4)
+        self.distance_frame_layout.addLayout(self.distance_layoutH5)
         self.distance_frame_layout.addLayout(self.distance_grid_layout)
         self.distance_frame_layout.addStretch(100)
         self.distance_page.setLayout(self.distance_frame_layout)
@@ -808,6 +844,7 @@ class Application(QWidget):
         self.result_frame_layout = QVBoxLayout(self.result_frame)
         self.result_layoutH1 = QHBoxLayout()
         self.result_layoutH2 = QHBoxLayout()
+        self.result_layoutH3 = QHBoxLayout()
         self.result_grid_layout = QGridLayout(self.result_frame)
 
         self.result_fit_mess = QLabel("Wartosc funkcji celu", self.result_frame)
@@ -825,9 +862,16 @@ class Application(QWidget):
         self.result_frame_layout.addLayout(self.result_layoutH2)
         self.result_frame_layout.addLayout(self.result_layoutH1)
         self.result_frame_layout.addLayout(self.result_grid_layout)
+        self.result_frame_layout.addLayout(self.result_layoutH3)
         self.result_page.setLayout(self.result_frame_layout)
-        self.result_page.setStyleSheet('border: 2px solid red')
+
         self.result_frame_layout.addStretch(20)
+
+        self.result_icon_ground = QLabel(self.parameters_page)
+        self.result_icon_bee = QPixmap('result_.png')
+        self.result_icon_bee_scaled = self.result_icon_bee.scaled(self.result_icon_bee.width() // 2, self.result_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.result_icon_ground.setPixmap(self.result_icon_bee_scaled)
+        self.result_layoutH3.addWidget(self.result_icon_ground, alignment = Qt.AlignCenter)
 
         self.menu_animation = QPropertyAnimation(self.menu_frame, b"geometry")
         self.menu_animation.setDuration(self.animation_duration)
@@ -1087,7 +1131,7 @@ class Application(QWidget):
         for i in range(x):
             for j in range(z):
                 lineedit = QLineEdit(self.price_frame)
-                validator = QIntValidator()
+                validator = QDoubleValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
                 if flag == 1:
@@ -1098,14 +1142,16 @@ class Application(QWidget):
                 self.price_grid_layout.addWidget(lineedit, i, j)
         for i in range(y):
             for j in range(x):
+                print(f"i = {i}")
+                print(f"j = {j}")
                 lineedit = QLineEdit(self.distance_frame)
-                validator = QIntValidator()
+                validator = QDoubleValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
                 if flag == 1:
                     lineedit.setText(str(matrix_distance[i][j]))
                 else:
-                    lineedit.setText('0')
+                    lineedit.setText('1')
                 self.lineedit_distance.append(lineedit)
                 self.distance_grid_layout.addWidget(lineedit, i, j)
  
@@ -1124,49 +1170,60 @@ class Application(QWidget):
             return
         if (self.response):
             self.flag = 1
-        self.object = pd.read_csv(self.response[0])
-        self.object_producents = self.object["producenci"]
-        self.object_producents = self.object["producenci"].to_numpy()
-        self.object_producents_size = len(self.object_producents)
-        self.len_producents = len(self.object_producents)
-        self.len_sqrt = int(np.sqrt(self.len_producents))
-        self.rows_producents = int(self.len_producents / self.len_sqrt)
-        self.cols_producents = int(self.len_sqrt)
-        self.matrix_producents_app = self.object_producents.reshape((self.rows_producents, self.cols_producents))
+        self.path = np.genfromtxt(self.response[0], delimiter=',', skip_header=1)
+        self.producents_idx = 0
+        self.matrix_producents_app = self.path[:, self.producents_idx].reshape(-1,3)
+        # self.object = pd.read_csv(self.response[0])
+        # self.object_producents = self.object["producenci"]
+        # self.object_producents = self.object["producenci"].to_numpy()
+        # self.object_producents_size = len(self.object_producents)
+        # self.len_producents = len(self.object_producents)
+        # self.len_sqrt = int(np.sqrt(self.len_producents))
+        # self.rows_producents = int(self.len_producents / self.len_sqrt)
+        # self.cols_producents = int(self.len_sqrt)
+        # self.matrix_producents_app = self.object_producents.reshape((self.rows_producents, self.cols_producents))
 
         self.set_product.setText(str(len(self.matrix_producents_app[0])))
         self.tr = np.transpose(self.matrix_producents_app)
         self.demand_producents_edit.setText(str(len(self.tr[0])))
 
-        self.object_clients = self.object["klienci"]
-        self.object_clients = self.object["klienci"].to_numpy()
-        self.object_clients_size = len(self.object_clients)
-        self.len_clients = len(self.object_clients)
-        self.len_sqrt = int(np.sqrt(self.len_clients))
-        self.rows_clients = int(self.len_clients / self.len_sqrt)
-        self.cols_clients = int(self.len_sqrt)
-        self.matrix_clients_app = self.object_clients.reshape((self.rows_clients, self.cols_clients))
+        self.clients_idx = 1
+        self.matrix_clients_app = self.path[:, self.clients_idx].reshape(-1,3)
+        # self.object_clients = self.object["klienci"]
+        # self.object_clients = self.object["klienci"].to_numpy()
+        # self.object_clients_size = len(self.object_clients)
+        # self.len_clients = len(self.object_clients)
+        # self.len_sqrt = int(np.sqrt(self.len_clients))
+        # self.rows_clients = int(self.len_clients / self.len_sqrt)
+        # self.cols_clients = int(self.len_sqrt)
+        # self.matrix_clients_app = self.object_clients.reshape((self.rows_clients, self.cols_clients))
 
         self.tr = np.transpose(self.matrix_clients_app)
         self.demand_clients_edit.setText(str(len(self.tr[0])))
 
-        self.object_price = self.object["cena"]
-        self.object_price = self.object["cena"].to_numpy()
-        self.object_price_size = len(self.object_price)
-        self.len_price = len(self.object_price)
-        self.len_sqrt = int(np.sqrt(self.len_price))
-        self.rows_price = int(self.len_price / self.len_sqrt)
-        self.cols_price = int(self.len_sqrt)
-        self.matrix_price_app = self.object_price.reshape((self.rows_price, self.cols_price))
 
-        self.object_distance = self.object["dystans"]
-        self.object_distance = self.object["dystans"].to_numpy()
-        self.object_distance_size = len(self.object_distance)
-        self.len_distance = len(self.object_distance)
-        self.len_sqrt = int(np.sqrt(self.len_distance))
-        self.rows_distance = int(self.len_distance / self.len_sqrt)
-        self.cols_distance = int(self.len_sqrt)
-        self.matrix_distance_app = self.object_distance.reshape((self.rows_distance, self.cols_distance))
+        self.price_idx = 2
+        self.matrix_price_app = self.path[:, self.price_idx].reshape(-1,3)
+        # self.object_price = self.object["cena"]
+        # self.object_price = self.object["cena"].to_numpy()
+        # self.object_price_size = len(self.object_price)
+        # self.len_price = len(self.object_price)
+        # self.len_sqrt = int(np.sqrt(self.len_price))
+        # self.rows_price = int(self.len_price / self.len_sqrt)
+        # self.cols_price = int(self.len_sqrt)
+        # self.matrix_price_app = self.object_price.reshape((self.rows_price, self.cols_price))
+
+
+        self.distance_idx = self.matrix_producents_app.shape[1] + self.matrix_clients_app.shape[1] + self.matrix_price.shape[1]
+        self.matrix_distance_app = self.path[:, self.distance_idx].reshape(-1,self.matrix_producents_app.shape[1])
+        # self.object_distance = self.object["dystans"]
+        # self.object_distance = self.object["dystans"].to_numpy()
+        # self.object_distance_size = len(self.object_distance)
+        # self.len_distance = len(self.object_distance)
+        # self.len_sqrt = int(np.sqrt(self.len_distance))
+        # self.rows_distance = int(self.len_distance / self.len_sqrts)
+        # self.cols_distance = int(self.len_sqrt)
+        # self.matrix_distance_app = self.object_distance.reshape((self.rows_distance, self.cols_distance))
 
         self.update_matrix(self.flag, self.matrix_producents_app, self.matrix_clients_app, self.matrix_price_app, self.matrix_distance_app)
         
@@ -1196,7 +1253,7 @@ class Application(QWidget):
         self.matrix_clients_app = [[0] * self.number_check for i in range(y)]
     
         self.matrix_price_app = [[0]*self.number_check for i in range(x)]
-        self.matrix_distance_app = [[0] * x for i in range(y)]
+        self.matrix_distance_app = [[1] * x for i in range(y)]
 
         k = 0
         for i in range(x):
