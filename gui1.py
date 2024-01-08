@@ -4,7 +4,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, QThread, Signal
 from PySide6.QtWidgets import QApplication, QGridLayout, QWidget, QVBoxLayout, QPushButton, QLabel, QMessageBox,QFrame, QButtonGroup, QCheckBox, QFileDialog ,QLineEdit,QHBoxLayout, QStackedWidget, QStackedLayout
-from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator
+from PySide6.QtGui import QPixmap, QIcon, Qt, QColor, QIntValidator, QDoubleValidator
 import pandas as pd
 import random
 
@@ -256,7 +256,7 @@ class Canvas(FigureCanvas):
     def __init__(self, vector, iteration):
         self.vector = vector
         self.iteration = iteration
-        fig, self.ax = plt.subplots(figsize=(5, 4), dpi=200)
+        fig, self.ax = plt.subplots(figsize=(3, 3), dpi=200)
         super().__init__(fig)
         
 
@@ -308,7 +308,7 @@ class Application(QWidget):
         
     def setup(self):
         
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 1200, 720)
 
         #ustawienie layoutów####
         self.layoutV1 = QVBoxLayout()
@@ -632,6 +632,12 @@ class Application(QWidget):
         self.diagram_button_generate.setStyleSheet('background-color: white')
         self.diagram_frame_layout.addWidget(self.diagram_button_generate, alignment=Qt.AlignTop)
         self.diagram_button_generate.clicked.connect(self.Generate_ABC)
+
+        self.diagram_icon = QLabel(self.diagram_page)
+        self.diagram_icon_bee = QPixmap('eng.png')
+        self.diagram_icon_bee_scaled = self.diagram_icon_bee.scaled(self.diagram_icon_bee.width() // 2.3, self.diagram_icon_bee.height() // 2.3, Qt.KeepAspectRatio)
+        self.diagram_icon.setPixmap(self.diagram_icon_bee_scaled)
+        self.diagram_frame_layout.addWidget(self.diagram_icon, alignment = Qt.AlignCenter)
         
 
 
@@ -743,7 +749,11 @@ class Application(QWidget):
         self.demand_layoutH6.addWidget(self.set_product, alignment=Qt.AlignTop)
         self.set_product.textChanged.connect(self.upgrade_product)
         
-
+        self.demand_icon = QLabel(self.demand_page)
+        self.demand_icon_bee = QPixmap('demand_.png')
+        self.demand_icon_bee_scaled = self.demand_icon_bee.scaled(self.demand_icon_bee.width() // 2, self.demand_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.demand_icon.setPixmap(self.demand_icon_bee_scaled)
+        self.demand_layoutH7.addWidget(self.demand_icon, alignment = Qt.AlignCenter)
 
 
         self.demand_producents_edit.textChanged.connect(self.update_matrix)
@@ -760,6 +770,7 @@ class Application(QWidget):
         self.demand_frame_layout.addLayout(self.demand_grid_layout)
         self.demand_frame_layout.addLayout(self.demand_layoutH1)
         self.demand_frame_layout.addLayout(self.demand_grid_layout2)
+        self.demand_frame_layout.addLayout(self.demand_layoutH7)
         self.demand_frame_layout.addStretch(100)
         self.demand_page.setLayout(self.demand_frame_layout)
 
@@ -770,8 +781,14 @@ class Application(QWidget):
         self.price_layoutH2 = QHBoxLayout()
         self.price_layoutH3 = QHBoxLayout()
         self.price_layoutH4 = QHBoxLayout()
-        self.price_grid_layout = QGridLayout(self.price_frame)
+        self.price_layoutH5 = QHBoxLayout()
 
+        self.price_grid_layout = QGridLayout(self.price_frame)
+        self.price_icon = QLabel(self.price_page)
+        self.price_icon_bee = QPixmap('price.png')
+        self.price_icon_bee_scaled = self.price_icon_bee.scaled(self.price_icon_bee.width() // 2, self.price_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.price_icon.setPixmap(self.price_icon_bee_scaled)
+        self.price_layoutH5.addWidget(self.price_icon, alignment = Qt.AlignCenter)
 
 
         self.price_text = QLabel("Uzupełnij macierz kosztów", self.price_frame)
@@ -782,6 +799,7 @@ class Application(QWidget):
         self.price_frame_layout.addLayout(self.price_layoutH2)
         self.price_frame_layout.addLayout(self.price_layoutH3)
         self.price_frame_layout.addLayout(self.price_layoutH4)
+        self.price_frame_layout.addLayout(self.price_layoutH5)
         self.price_frame_layout.addLayout(self.price_grid_layout)
         self.price_frame_layout.addStretch(100)
         self.price_page.setLayout(self.price_frame_layout)
@@ -799,6 +817,7 @@ class Application(QWidget):
         self.distance_layoutH2 = QHBoxLayout()
         self.distance_layoutH3 = QHBoxLayout()
         self.distance_layoutH4 = QHBoxLayout()
+        self.distance_layoutH5 = QHBoxLayout()
         self.distance_grid_layout = QGridLayout(self.distance_frame)
 
 
@@ -806,10 +825,18 @@ class Application(QWidget):
         self.distance_text.setStyleSheet('color: white')
         self.distance_layoutH2.addWidget(self.distance_text)
 
+        self.distance_icon = QLabel(self.distance_page)
+        self.distance_icon_bee = QPixmap('distance.png')
+        self.distance_icon_bee_scaled = self.distance_icon_bee.scaled(self.distance_icon_bee.width() // 2, self.distance_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.distance_icon.setPixmap(self.distance_icon_bee_scaled)
+        self.distance_layoutH5.addWidget(self.distance_icon, alignment = Qt.AlignCenter)
+
+
         self.distance_frame_layout.addLayout(self.distance_layoutH1)
         self.distance_frame_layout.addLayout(self.distance_layoutH2)
         self.distance_frame_layout.addLayout(self.distance_layoutH3)
         self.distance_frame_layout.addLayout(self.distance_layoutH4)
+        self.distance_frame_layout.addLayout(self.distance_layoutH5)
         self.distance_frame_layout.addLayout(self.distance_grid_layout)
         self.distance_frame_layout.addStretch(100)
         self.distance_page.setLayout(self.distance_frame_layout)
@@ -1105,7 +1132,7 @@ class Application(QWidget):
         for i in range(x):
             for j in range(z):
                 lineedit = QLineEdit(self.price_frame)
-                validator = QIntValidator()
+                validator = QDoubleValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
                 if flag == 1:
@@ -1116,8 +1143,10 @@ class Application(QWidget):
                 self.price_grid_layout.addWidget(lineedit, i, j)
         for i in range(y):
             for j in range(x):
+                print(f"i = {i}")
+                print(f"j = {j}")
                 lineedit = QLineEdit(self.distance_frame)
-                validator = QIntValidator()
+                validator = QDoubleValidator()
                 lineedit.setValidator(validator)
                 lineedit.setStyleSheet('background-color: white')
                 if flag == 1:
@@ -1142,49 +1171,60 @@ class Application(QWidget):
             return
         if (self.response):
             self.flag = 1
-        self.object = pd.read_csv(self.response[0])
-        self.object_producents = self.object["producenci"]
-        self.object_producents = self.object["producenci"].to_numpy()
-        self.object_producents_size = len(self.object_producents)
-        self.len_producents = len(self.object_producents)
-        self.len_sqrt = int(np.sqrt(self.len_producents))
-        self.rows_producents = int(self.len_producents / self.len_sqrt)
-        self.cols_producents = int(self.len_sqrt)
-        self.matrix_producents_app = self.object_producents.reshape((self.rows_producents, self.cols_producents))
+        self.path = np.genfromtxt(self.response[0], delimiter=',', skip_header=1)
+        self.producents_idx = 0
+        self.matrix_producents_app = self.path[:, self.producents_idx].reshape(-1,3)
+        # self.object = pd.read_csv(self.response[0])
+        # self.object_producents = self.object["producenci"]
+        # self.object_producents = self.object["producenci"].to_numpy()
+        # self.object_producents_size = len(self.object_producents)
+        # self.len_producents = len(self.object_producents)
+        # self.len_sqrt = int(np.sqrt(self.len_producents))
+        # self.rows_producents = int(self.len_producents / self.len_sqrt)
+        # self.cols_producents = int(self.len_sqrt)
+        # self.matrix_producents_app = self.object_producents.reshape((self.rows_producents, self.cols_producents))
 
         self.set_product.setText(str(len(self.matrix_producents_app[0])))
         self.tr = np.transpose(self.matrix_producents_app)
         self.demand_producents_edit.setText(str(len(self.tr[0])))
 
-        self.object_clients = self.object["klienci"]
-        self.object_clients = self.object["klienci"].to_numpy()
-        self.object_clients_size = len(self.object_clients)
-        self.len_clients = len(self.object_clients)
-        self.len_sqrt = int(np.sqrt(self.len_clients))
-        self.rows_clients = int(self.len_clients / self.len_sqrt)
-        self.cols_clients = int(self.len_sqrt)
-        self.matrix_clients_app = self.object_clients.reshape((self.rows_clients, self.cols_clients))
+        self.clients_idx = 1
+        self.matrix_clients_app = self.path[:, self.clients_idx].reshape(-1,3)
+        # self.object_clients = self.object["klienci"]
+        # self.object_clients = self.object["klienci"].to_numpy()
+        # self.object_clients_size = len(self.object_clients)
+        # self.len_clients = len(self.object_clients)
+        # self.len_sqrt = int(np.sqrt(self.len_clients))
+        # self.rows_clients = int(self.len_clients / self.len_sqrt)
+        # self.cols_clients = int(self.len_sqrt)
+        # self.matrix_clients_app = self.object_clients.reshape((self.rows_clients, self.cols_clients))
 
         self.tr = np.transpose(self.matrix_clients_app)
         self.demand_clients_edit.setText(str(len(self.tr[0])))
 
-        self.object_price = self.object["cena"]
-        self.object_price = self.object["cena"].to_numpy()
-        self.object_price_size = len(self.object_price)
-        self.len_price = len(self.object_price)
-        self.len_sqrt = int(np.sqrt(self.len_price))
-        self.rows_price = int(self.len_price / self.len_sqrt)
-        self.cols_price = int(self.len_sqrt)
-        self.matrix_price_app = self.object_price.reshape((self.rows_price, self.cols_price))
 
-        self.object_distance = self.object["dystans"]
-        self.object_distance = self.object["dystans"].to_numpy()
-        self.object_distance_size = len(self.object_distance)
-        self.len_distance = len(self.object_distance)
-        self.len_sqrt = int(np.sqrt(self.len_distance))
-        self.rows_distance = int(self.len_distance / self.len_sqrt)
-        self.cols_distance = int(self.len_sqrt)
-        self.matrix_distance_app = self.object_distance.reshape((self.rows_distance, self.cols_distance))
+        self.price_idx = 2
+        self.matrix_price_app = self.path[:, self.price_idx].reshape(-1,3)
+        # self.object_price = self.object["cena"]
+        # self.object_price = self.object["cena"].to_numpy()
+        # self.object_price_size = len(self.object_price)
+        # self.len_price = len(self.object_price)
+        # self.len_sqrt = int(np.sqrt(self.len_price))
+        # self.rows_price = int(self.len_price / self.len_sqrt)
+        # self.cols_price = int(self.len_sqrt)
+        # self.matrix_price_app = self.object_price.reshape((self.rows_price, self.cols_price))
+
+
+        self.distance_idx = self.matrix_producents_app.shape[1] + self.matrix_clients_app.shape[1] + self.matrix_price.shape[1]
+        self.matrix_distance_app = self.path[:, self.distance_idx].reshape(-1,self.matrix_producents_app.shape[1])
+        # self.object_distance = self.object["dystans"]
+        # self.object_distance = self.object["dystans"].to_numpy()
+        # self.object_distance_size = len(self.object_distance)
+        # self.len_distance = len(self.object_distance)
+        # self.len_sqrt = int(np.sqrt(self.len_distance))
+        # self.rows_distance = int(self.len_distance / self.len_sqrts)
+        # self.cols_distance = int(self.len_sqrt)
+        # self.matrix_distance_app = self.object_distance.reshape((self.rows_distance, self.cols_distance))
 
         self.update_matrix(self.flag, self.matrix_producents_app, self.matrix_clients_app, self.matrix_price_app, self.matrix_distance_app)
         
