@@ -18,7 +18,6 @@ class Producent():
 
 class Bee():
     def __init__(self, product, matrix_producents, matrix_customers, number_products, number_customers, number_bees, number_observator, restricition, producents, price, distance):
-        self.product = product
         self.matrix_producents = matrix_producents
         self.matrix_customers = matrix_customers
         self.number_products = number_products
@@ -29,36 +28,37 @@ class Bee():
         self.producents = producents  #Wektor producentow produkujacych produkt X
         self.price = price
         self.distance = distance
+        self.product = product
 
     def function(self, distribuation):
             k = self.product - 1
-            m = len(self.matrix_producents[0])
-            n = len(distribuation[0])
+            m = len(np.transpose(self.matrix_producents)[0])
+            n = len(np.transpose(distribuation)[0])
             value = 0
             matrix = [[0] * m for i in range(n)]
             for i in range(n):
                 for j in range(m):
-                    if distribuation[i][j] >= 0.1 * self.matrix_producents[j][k]:
-                        matrix[i][j] = distribuation[i][j] * self.price[j][k]
+                    if distribuation[i][j] >= 0.1 * self.matrix_producents[j][0]:
+                        matrix[i][j] = distribuation[i][j] * self.price[j][0]
                     else:
-                        matrix[i][j] = distribuation[i][j] * self.price[j][k] + 0.45 * self.distance[i][j]
+                        matrix[i][j] = distribuation[i][j] * self.price[j][0] + 0.45 * self.distance[i][j]
                     value += matrix[i][j]
                     value = round(value, 5)
             return value
-    
+
     def function_efficency(self, value):
             value_eff = 1 / (1 + value)
             value_eff = round(value_eff, 5)
-                    
+
             return value_eff
-        
+
 
     def correct_position(self, new_bee):
-            
+
             counter=0
             kolumny = np.sum(new_bee, axis=0)
             wiersze = np.sum(new_bee, axis=1)
-            
+
             while not(np.all(self.restricition == wiersze) and np.all(kolumny <= self.producents)):
                 a=np.shape(new_bee)[0]
                 b=np.shape(new_bee)[1]
@@ -72,13 +72,11 @@ class Bee():
                                 new_bee[i, k] = new_bee[i, k] + value
                                 kolumny = np.sum(new_bee, axis=0)
                                 wiersze=np.sum(new_bee,axis=1)
-                                break
                         if self.restricition[i]< wiersze[i]:
                             if new_bee[i,k]-value > 0:
                                 new_bee[i, k] = new_bee[i, k] - value
                                 kolumny = np.sum(new_bee, axis=0)
                                 wiersze=np.sum(new_bee,axis=1)
-                                break
                 counter += 1
                 kolumny = np.sum(new_bee, axis=0)
                 wiersze=np.sum(new_bee,axis=1)
@@ -87,8 +85,8 @@ class Bee():
                     new_bee=np.squeeze(new_bee)
                     return new_bee
             return new_bee
-        
-        
+
+
     def generate_matrix_production(self, producents, n):
 
             matrixes = []
@@ -121,10 +119,9 @@ class Bee():
             for i in range(len(matrixes)):
                 vector.append(self.function(matrixes[i]))
                 vector_eff.append(self.function_efficency(vector[i]))
-
             return matrixes, vector, vector_eff    
-        
-        
+
+
     def generate_neighbours(self, matrix):
         n = len(matrix)
         neighbours_matrix = np.zeros(np.shape(matrix))
@@ -148,20 +145,14 @@ class Bee():
                     counter_list[i] += 1
             matrixes = list_neighbours
             return matrixes, vector, eff, counter_list
-        
+
     def onlooker_bees(self, matrixes, vector, eff, counter_list, ob):
             counter = 0
             counter_help = 0
             matrixes1 = np.array(matrixes[0])
-            if ob < len(eff):
-                list_position = [np.zeros(np.shape(matrixes1)) for i in range(len(eff))]
-                list_value = [0 for i in range(len(eff))]
-                list_efficency = [0 for i in range(len(eff))]
-            else:
-                list_position = [np.zeros(np.shape(matrixes1)) for i in range(ob)]
-                list_value = [0 for i in range(ob)]
-                list_efficency = [0 for i in range(ob)]
-            
+            list_position = [np.zeros(np.shape(matrixes1)) for i in range(len(eff))]
+            list_value = [0 for i in range(len(eff))]
+            list_efficency = [0 for i in range(len(eff))]
             list_probability = [0 for i in range(len(eff))]
             for i in range(len(eff)):
                 list_probability[i] = eff[i] / np.sum(eff)
@@ -194,16 +185,20 @@ class Bee():
                     vector[i] = vec
                     eff[i] = eff1
                     counter_list[i] = 0
-                
+
             return matrixes, np.squeeze(vector), np.squeeze(eff), counter_list
-        
+
 
     def ABC(self, limit, limit_iter):
+            sum_produkcja=np.sum(self.producents)
+            sum_ograniczenia=np.sum(self.restricition)
+            if sum_ograniczenia > sum_produkcja:
+                print("Dane nie umożliwiają rozwiązania problemu")
+                return 
             population, vec, vec_eff = self.generate_matrix_production(self.matrix_producents, self.number_bees)
             vector_best = []
             counter = 0
             while counter < limit_iter:
-                print(f" Mati to szef zapamiętaj to po raz  {counter}")
                 population, vec, vec_eff, counter_list= self.employee_bees(population, vec, vec_eff)
                 population, vec, vec_eff, counter_list = self.onlooker_bees(population, vec, vec_eff, counter_list, self.number_observator)
                 population, vec, vec_eff, counter_list = self.scout_bees(population, vec, vec_eff, counter_list, limit)
@@ -215,7 +210,6 @@ class Bee():
             population_best = population[fitness_index]
 
             return population_best, vector_best, fitness_value
-
 class WorkerThread(QThread):
     finished = Signal()
 
@@ -237,7 +231,7 @@ class WorkerThread(QThread):
         self.population_best = None
         self.vector_best = None
         self.fitness_value = None
-        self.iteration_list = []
+        self.iteration_list = None
 
     def run(self):
         bee = Bee(
@@ -247,12 +241,14 @@ class WorkerThread(QThread):
             self.production, self.restriction,
             self.matrix_price_app, self.matrix_distance_app
         )
-        self.opulation_best, self.vector_best, self.fitness_value = bee.ABC(self.criterium, self.iteration)
-        self.iteration_list = [i+1 for i in range(self.iteration)]
+        self.population_best, self.vector_best, self.fitness_value = bee.ABC(self.criterium, self.iteration)
+        self.iteration_list = [i + 1 for i in range(self.iteration)]
+        print(self.population_best)
+        print("\n")
+        print(self.vector_best)
+
         self.finished.emit()
-        print(population_best)
-        print(vector_best)
-        print(fitness_value)
+
 
 
 class Canvas(FigureCanvas):
@@ -289,6 +285,7 @@ class Application(QWidget):
         self.parameters_page = QWidget(self)
         self.price_page = QWidget(self)
         self.distance_page = QWidget(self)
+        self.result_page = QWidget(self)
 
 
 
@@ -333,6 +330,7 @@ class Application(QWidget):
         self.stack_main_widget.addWidget(self.distance_page)
         self.stack_main_widget.addWidget(self.price_page)
         self.stack_main_widget.addWidget(self.demand_page)
+        self.stack_main_widget.addWidget(self.result_page)
         self.main_layout.addWidget(self.stack_main_widget)
 
 
@@ -373,6 +371,8 @@ class Application(QWidget):
 
         #Slide menu##########
 
+        self.flag_finish = 0
+        
 
 
 
@@ -386,6 +386,12 @@ class Application(QWidget):
 
         
             #przyciski w slidemenu
+        
+        self.result = QPushButton("Wynik rozwiazania", self.menu_frame)
+        self.result_icon = QLabel(self)
+        self.result_icon.setPixmap(QPixmap('icons8-result-64.png'))
+        self.result.clicked.connect(self.result_ui)
+
 
         self.parameters = QPushButton("Parametery", self.menu_frame)
         self.parameters_label = QLabel(self)
@@ -417,6 +423,7 @@ class Application(QWidget):
         self.main_prev_label.setPixmap(QPixmap('icons8-home-page-40.png'))
         self.main_prev.clicked.connect(self.main_prev_ui)
     
+        self.result.setStyleSheet('background-color:darkviolet; color:white')
         self.parameters.setStyleSheet('background-color:darkviolet; color: white')
         self.diagram.setStyleSheet('background-color:darkviolet; color: white')
         self.distance.setStyleSheet('background-color:darkviolet; color: white')
@@ -431,6 +438,7 @@ class Application(QWidget):
         self.layout_menuH4 = QHBoxLayout()
         self.layout_menuH5 = QHBoxLayout()
         self.layout_menuH6 = QHBoxLayout()
+        self.layout_menuH7 = QHBoxLayout()
 
 
         self.layout_menuH1.addWidget(self.parameters_label)
@@ -456,7 +464,11 @@ class Application(QWidget):
         self.layout_menuH6.addWidget(self.main_prev_label)
         self.layout_menuH6.addWidget(self.main_prev)
         self.layout_menuH6.addStretch(20)
-        
+
+        self.layout_menuH7.addWidget(self.result_icon)
+        self.layout_menuH7.addWidget(self.result)
+        self.layout_menuH7.addStretch(20)
+
 
         self.menu_layout.addLayout(self.layout_menuH1)
         self.menu_layout.addLayout(self.layout_menuH2)
@@ -464,6 +476,13 @@ class Application(QWidget):
         self.menu_layout.addLayout(self.layout_menuH4)
         self.menu_layout.addLayout(self.layout_menuH5)
         self.menu_layout.addLayout(self.layout_menuH6)
+        self.menu_layout.addLayout(self.layout_menuH7)
+
+        
+        self.result.hide()
+        self.result_icon.hide()
+        
+
         
 
 #Ustawienie stron###########################################################
@@ -474,6 +493,14 @@ class Application(QWidget):
         self.parameters_layout.addWidget(self.parameters_frame)
         self.stack_main_widget.addWidget(self.parameters_page)
         self.counter_parameters = 1
+    
+        self.result_page = QWidget(self)
+        self.result_frame = QFrame(self.result_page)
+        self.result_layout = QVBoxLayout(self.result_page)
+        self.result_frame.setStyleSheet('background-color: #211B1B')
+        self.result_layout.addWidget(self.result_frame)
+        self.stack_main_widget.addWidget(self.result_page)
+
         
     
         self.demand_page = QWidget(self)
@@ -773,8 +800,29 @@ class Application(QWidget):
         self.distance_frame_layout.addStretch(100)
         self.distance_page.setLayout(self.distance_frame_layout)
 
+###############
+        self.result_frame_layout = QVBoxLayout(self.result_frame)
+        self.result_layoutH1 = QHBoxLayout()
+        self.result_layoutH2 = QHBoxLayout()
+        self.result_grid_layout = QGridLayout(self.result_frame)
 
+        self.result_fit_mess = QLabel("Wartosc funkcji celu", self.result_frame)
+        self.result_fit_mess.setStyleSheet('color:white')
+        self.result_layoutH2.addWidget(self.result_fit_mess)
 
+        self.result_fit = QLabel(self.result_frame)
+        self.result_fit.setStyleSheet('color:white')
+        
+        self.result_layoutH2.addWidget(self.result_fit)
+
+        self.result_mess = QLabel("Optymalna macierz dystrybucji", self.result_frame)
+        self.result_mess.setStyleSheet('color:white')
+        self.result_layoutH1.addWidget(self.result_mess)
+        self.result_frame_layout.addLayout(self.result_layoutH2)
+        self.result_frame_layout.addLayout(self.result_layoutH1)
+        self.result_frame_layout.addLayout(self.result_grid_layout)
+        self.result_page.setLayout(self.result_frame_layout)
+        self.result_frame_layout.addStretch(20)
 
         self.menu_animation = QPropertyAnimation(self.menu_frame, b"geometry")
         self.menu_animation.setDuration(self.animation_duration)
@@ -799,6 +847,8 @@ class Application(QWidget):
                 product = self.list_check.index(check)
         product += 1
         k = 0
+    
+
         production, restriction = self.get_restriction(self.matrix_clients_app, self.matrix_producents_app, product)
         number_producents = int(self.demand_producents_edit.text())
         number_clients = int(self.demand_clients_edit.text())
@@ -806,14 +856,46 @@ class Application(QWidget):
         observator_bee = int(self.set_observator_bee.text())
         criterium = int(self.set_criterium.text())
         iteration = int(self.set_iteration.text())
-        print(product)
+
+
+       
        # print(product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, production, restriction, self.matrix_price_app, self.matrix_distance_app)
-        self.thread = WorkerThread(iteration, criterium, product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, production, restriction, self.matrix_price_app, self.matrix_distance_app)
+        self.thread = WorkerThread(iteration, criterium, product, self.matrix_producents_app, self.matrix_clients_app, number_producents, number_clients, employee_bee, observator_bee, restriction, production, self.matrix_price_app, self.matrix_distance_app)
         self.thread.finished.connect(self.thread_finished)
         self.thread.start()
     def thread_finished(self):
         print("Thread finished.")
-        print(self.thread.vector_best, self.thread.iteration_list)
+        print(self.thread.fitness_value)
+        self.result.show()
+        self.result_icon.show()
+        self.result_fit.setText(str(self.thread.fitness_value))
+
+        
+
+
+
+        for i in reversed(range(self.result_grid_layout.count())):
+            item = self.result_grid_layout.itemAt(i)
+            widget = item.widget()
+            self.result_grid_layout.removeItem(item)
+            widget.setParent(None)
+        
+        for i in range(len(self.thread.population_best)):
+            for j in range(len(self.thread.population_best[0])):
+                lineedit = QLineEdit(self.result_frame)
+                validator = QIntValidator()
+                lineedit.setValidator(validator)
+                lineedit.setStyleSheet('background-color: white')
+                lineedit.setText(str(self.thread.population_best[i][j]))
+                self.result_grid_layout.addWidget(lineedit, i, j)
+        # for i, row in enumerate(self.thread_population_best):
+        #     for j, value in enumerate(row):
+        #         # Tworzymy QLineEdit
+        #         line_edit = QLineEdit(str(value))
+        #         # Dodajemy do self.result_grid_layout na odpowiedniej pozycji
+        #         self.result_grid_layout.addWidget(line_edit, i + 1, j)
+
+
         self.diagram = Canvas(self.thread.vector_best, self.thread.iteration_list)
         self.diagram.show()
 
@@ -829,7 +911,7 @@ class Application(QWidget):
             self.menu_animation.setEndValue(QRect(-self.menu_width, 0, 0, self.height()))
         self.menu_btn.raise_()
         self.menu_animation.start()
-
+    
     def parameters_ui(self):
         if self.stack_main_widget.currentWidget != self.parameters_page:
             self.bee_label.hide()
@@ -883,6 +965,11 @@ class Application(QWidget):
             self.stack_main_widget.setCurrentWidget(self.main_page)
         
         print("clicked!")
+    def result_ui(self):
+        if self.stack_main_widget.currentWidget != self.result_page:
+            self.bee_label.hide()
+            self.stack_main_widget.setCurrentWidget(self.result_page)
+        
     def update_text_E(self, text):
 
         self.diagram_text_E.setText(text)
