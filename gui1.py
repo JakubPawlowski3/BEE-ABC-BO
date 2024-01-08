@@ -468,7 +468,7 @@ class Application(QWidget):
 
         self.layout_menuH7.addWidget(self.result_icon)
         self.layout_menuH7.addWidget(self.result)
-        self.layout_menuH7.addStretch(20)
+        self.layout_menuH7.addStretch(10)
 
         self.menu_lab = QLabel(self.menu_frame)
         self.menu_lab.setFixedSize(40, 100)
@@ -571,6 +571,7 @@ class Application(QWidget):
         self.set_employee_bee = QLineEdit(self.parameters_page)
         self.set_employee_bee.setStyleSheet('background-color: white')
         self.set_employee_bee.setValidator(self.validator)
+        self.set_employee_bee.setText("1")
         self.parameters_layoutH1.addWidget(self.set_employee_bee, alignment=Qt.AlignTop)
 
         self.observator_employee = QLabel("Wpisz liczbe obserwatorow", self.parameters_page)
@@ -579,6 +580,7 @@ class Application(QWidget):
         self.set_observator_bee = QLineEdit(self.parameters_page)
         self.set_observator_bee.setStyleSheet('background-color: white')
         self.set_observator_bee.setValidator(self.validator)
+        self.set_observator_bee.setText("1")
         self.parameters_layoutH2.addWidget(self.set_observator_bee, alignment=Qt.AlignTop)
 
         self.criterium = QLabel("Wpisz ilosc iteracji przed porzuceniem", self.parameters_page)
@@ -587,6 +589,7 @@ class Application(QWidget):
         self.set_criterium = QLineEdit(self.parameters_page)
         self.set_criterium.setStyleSheet('background-color: white')
         self.set_criterium.setValidator(self.validator)
+        self.set_criterium.setText("1")
         self.parameters_layoutH3.addWidget(self.set_criterium, alignment=Qt.AlignTop)
 
         self.iteration = QLabel("Wpisz ilosc iteracji", self.parameters_page)
@@ -595,11 +598,12 @@ class Application(QWidget):
         self.set_iteration = QLineEdit(self.parameters_page)
         self.set_iteration.setStyleSheet('background-color: white')
         self.set_iteration.setValidator(self.validator)
+        self.set_iteration.setText("1")
         self.parameters_layoutH4.addWidget(self.set_iteration, alignment=Qt.AlignTop)
 
         self.parameters_icon = QLabel(self.parameters_page)
         self.parameters_icon_bee = QPixmap('param.png')
-        self.parameters_icon_bee_scaled = self.parameters_icon_bee.scaled(self.parameters_icon_bee.width() // 1.8, self.parameters_icon_bee.height() // 1.8, Qt.KeepAspectRatio)
+        self.parameters_icon_bee_scaled = self.parameters_icon_bee.scaled(self.parameters_icon_bee.width() // 2, self.parameters_icon_bee.height() // 2, Qt.KeepAspectRatio)
         self.parameters_icon.setPixmap(self.parameters_icon_bee_scaled)
         self.parameters_layoutH5.addWidget(self.parameters_icon, alignment = Qt.AlignCenter)
 
@@ -675,6 +679,8 @@ class Application(QWidget):
         self.diagram_layoutH2.addStretch(20)
         self.diagram_layoutH3.addStretch(20)
         self.diagram_layoutH4.addStretch(20)
+        self.diagram_frame_layout.addStretch(30)
+        self.diagram_frame_layout.addSpacing(30)
        
 
 
@@ -686,6 +692,9 @@ class Application(QWidget):
         self.diagram_frame_layout.addLayout(self.diagram_layoutH6)
         self.diagram_frame_layout.addLayout(self.diagram_layoutH7)
         self.diagram_page.setLayout(self.diagram_frame_layout)
+        
+        self.diagram_frame_layout.addStretch(30)
+        self.diagram_frame_layout.addSpacing(30)
         
 
         ############
@@ -809,6 +818,7 @@ class Application(QWidget):
         self.result_frame_layout = QVBoxLayout(self.result_frame)
         self.result_layoutH1 = QHBoxLayout()
         self.result_layoutH2 = QHBoxLayout()
+        self.result_layoutH3 = QHBoxLayout()
         self.result_grid_layout = QGridLayout(self.result_frame)
 
         self.result_fit_mess = QLabel("Wartosc funkcji celu", self.result_frame)
@@ -826,9 +836,16 @@ class Application(QWidget):
         self.result_frame_layout.addLayout(self.result_layoutH2)
         self.result_frame_layout.addLayout(self.result_layoutH1)
         self.result_frame_layout.addLayout(self.result_grid_layout)
+        self.result_frame_layout.addLayout(self.result_layoutH3)
         self.result_page.setLayout(self.result_frame_layout)
-        self.result_page.setStyleSheet('border: 2px solid red')
+
         self.result_frame_layout.addStretch(20)
+
+        self.result_icon_ground = QLabel(self.parameters_page)
+        self.result_icon_bee = QPixmap('result_.png')
+        self.result_icon_bee_scaled = self.result_icon_bee.scaled(self.result_icon_bee.width() // 2, self.result_icon_bee.height() // 2, Qt.KeepAspectRatio)
+        self.result_icon_ground.setPixmap(self.result_icon_bee_scaled)
+        self.result_layoutH3.addWidget(self.result_icon_ground, alignment = Qt.AlignCenter)
 
         self.menu_animation = QPropertyAnimation(self.menu_frame, b"geometry")
         self.menu_animation.setDuration(self.animation_duration)
@@ -1106,7 +1123,7 @@ class Application(QWidget):
                 if flag == 1:
                     lineedit.setText(str(matrix_distance[i][j]))
                 else:
-                    lineedit.setText('0')
+                    lineedit.setText('1')
                 self.lineedit_distance.append(lineedit)
                 self.distance_grid_layout.addWidget(lineedit, i, j)
  
@@ -1197,7 +1214,7 @@ class Application(QWidget):
         self.matrix_clients_app = [[0] * self.number_check for i in range(y)]
     
         self.matrix_price_app = [[0]*self.number_check for i in range(x)]
-        self.matrix_distance_app = [[0] * x for i in range(y)]
+        self.matrix_distance_app = [[1] * x for i in range(y)]
 
         k = 0
         for i in range(x):
